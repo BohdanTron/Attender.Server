@@ -24,6 +24,8 @@ namespace Attender.Server.API
             services.AddApplication();
             services.AddInfrastructure(Configuration);
 
+            services.AddRouting(options => options.LowercaseUrls = true);
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
