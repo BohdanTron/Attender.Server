@@ -1,6 +1,8 @@
 ﻿using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace Attender.Server.Infrastructure.Persistence
 {
@@ -25,6 +27,13 @@ namespace Attender.Server.Infrastructure.Persistence
         public virtual DbSet<SubCategory> SubCategories => Set<SubCategory>();
         public virtual DbSet<Ticket> Tickets => Set<Ticket>();
         public virtual DbSet<User> Users => Set<User>();
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder
+                .LogTo(message => Debug.WriteLine(message), LogLevel.Information)
+                .EnableSensitiveDataLogging();
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
