@@ -1,0 +1,98 @@
+﻿{
+   "CodeGenerationMode": 0,
+   "ContextClassName": "AttenderDbContext",
+   "ContextNamespace": null,
+   "DefaultDacpacSchema": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": true,
+   "ModelNamespace": null,
+   "OutputContextPath": "Persistence",
+   "OutputPath": null,
+   "ProjectRootNamespace": "Attender.Server.Infrastructure",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 0,
+   "SelectedToBeGenerated": 1,
+   "Tables": [
+      {
+         "Name": "[dbo].[Artists]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Categories]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Cities]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Countries]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Events]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Locations]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Roles]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SearchHistory]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SubCategories]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Tickets]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Users]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UsersArtists]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UsersCities]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UsersEvents]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UsersFriends]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UsersLocations]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UsersSubCategories]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": "(localdb)\\mssqllocaldb.Attender",
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDbContextSplitting": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseInflector": true,
+   "UseLegacyPluralizer": false,
+   "UseNoConstructor": false,
+   "UseNoNavigations": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": true,
+   "UseSpatial": false
+}
