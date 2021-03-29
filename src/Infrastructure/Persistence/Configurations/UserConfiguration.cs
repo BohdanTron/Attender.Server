@@ -8,8 +8,9 @@ namespace Attender.Server.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<User> entity)
         {
-            entity.HasIndex(e => e.Email, "UC_Users_Email")
-                .IsUnique();
+            entity.HasIndex(e => e.Email, "IDX_Email")
+                .IsUnique()
+                .HasFilter("([Email] IS NOT NULL)");
 
             entity.HasIndex(e => e.PhoneNumber, "UC_Users_PhoneNumber")
                 .IsUnique();

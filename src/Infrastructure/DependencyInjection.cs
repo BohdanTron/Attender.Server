@@ -1,5 +1,7 @@
 ﻿using Attender.Server.Application.Common.Interfaces;
+using Attender.Server.Infrastructure.Auth;
 using Attender.Server.Infrastructure.Persistence;
+using Attender.Server.Infrastructure.Sms;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +19,13 @@ namespace Attender.Server.Infrastructure
             });
 
             services.AddScoped<IAttenderDbContext>(provider =>
-                provider.GetService<AttenderDbContext>() ?? throw new InvalidOperationException());
+                provider.GetService<AttenderDbContext>() ??
+                throw new ArgumentNullException(nameof(AttenderDbContext)));
+
+            services.AddTransient<IAuthService, AuthService>();
+            services.AddTransient<ITokensGenerator, TokensGenerator>();
+            services.AddTransient<ITokensValidator, TokensValidator>();
+            services.AddTransient<ISmsService, TwilioSmsService>();
 
             return services;
         }

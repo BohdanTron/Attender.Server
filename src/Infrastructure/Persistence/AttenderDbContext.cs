@@ -27,6 +27,7 @@ namespace Attender.Server.Infrastructure.Persistence
         public virtual DbSet<SubCategory> SubCategories => Set<SubCategory>();
         public virtual DbSet<Ticket> Tickets => Set<Ticket>();
         public virtual DbSet<User> Users => Set<User>();
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

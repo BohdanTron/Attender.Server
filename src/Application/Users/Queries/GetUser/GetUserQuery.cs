@@ -8,30 +8,29 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Users.Queries.GetUser
 {
-    public class GetUserQuery : IRequest<UserDto>
+    public class GetUserQuery : IRequest<UserDto?>
     {
-        public GetUserQuery(int id) => Id = id;
+        public GetUserQuery(string phoneNumber) => PhoneNumber = phoneNumber;
 
-        public int Id { get; }
+        public string PhoneNumber { get; }
     }
 
-    internal class GetUserQueryHandler : IRequestHandler<GetUserQuery, UserDto>
+    internal class GetUserQueryHandler : IRequestHandler<GetUserQuery, UserDto?>
     {
-        private readonly IAttenderDbContext _context;
+        private readonly IAttenderDbContext _dbContext;
         private readonly IMapper _mapper;
 
-        public GetUserQueryHandler(IAttenderDbContext context, IMapper mapper)
+        public GetUserQueryHandler(IAttenderDbContext dbContext, IMapper mapper)
         {
-            _context = context;
+            _dbContext = dbContext;
             _mapper = mapper;
         }
 
-        public Task<UserDto> Handle(GetUserQuery request, CancellationToken cancellationToken)
+        public Task<UserDto?> Handle(GetUserQuery query, CancellationToken cancellationToken)
         {
-            return _context.Users
-                .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync(u => u.Id == request.Id, cancellationToken);
-
+            return _dbContext.Users
+                .ProjectTo<UserDto?>(_mapper.ConfigurationProvider)
+                .SingleOrDefaultAsync(u => u!.PhoneNumber == query.PhoneNumber, cancellationToken);
         }
     }
 }

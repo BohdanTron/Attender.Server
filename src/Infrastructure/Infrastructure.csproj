@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.4" />
+    <PackageReference Include="Twilio" Version="5.57.0" />
   </ItemGroup>
 
 </Project>

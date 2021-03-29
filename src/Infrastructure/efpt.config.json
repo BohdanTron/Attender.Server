@@ -14,71 +14,7 @@
    "SelectedToBeGenerated": 1,
    "Tables": [
       {
-         "Name": "[dbo].[Artists]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[Categories]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[Cities]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[Countries]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[Events]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[Locations]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[Roles]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[SearchHistory]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[SubCategories]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[Tickets]",
-         "ObjectType": 0
-      },
-      {
          "Name": "[dbo].[Users]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[UsersArtists]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[UsersCities]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[UsersEvents]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[UsersFriends]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[UsersLocations]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[UsersSubCategories]",
          "ObjectType": 0
       }
    ],
@@ -92,6 +28,7 @@
    "UseLegacyPluralizer": false,
    "UseNoConstructor": false,
    "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
    "UseNodaTime": false,
    "UseNullableReferences": true,
    "UseSpatial": false

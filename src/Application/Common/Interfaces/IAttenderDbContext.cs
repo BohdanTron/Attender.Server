@@ -1,5 +1,7 @@
 ﻿using Attender.Server.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Common.Interfaces
 {
@@ -15,5 +17,8 @@ namespace Attender.Server.Application.Common.Interfaces
         DbSet<SubCategory> SubCategories { get; }
         DbSet<Ticket> Tickets { get; }
         DbSet<User> Users { get; }
+        DbSet<RefreshToken> RefreshTokens { get; }
+
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken());
     }
 }
