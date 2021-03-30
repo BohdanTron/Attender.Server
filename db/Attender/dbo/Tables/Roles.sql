@@ -1,0 +1,7 @@
+﻿CREATE TABLE [dbo].[Roles] (
+    [Id]   TINYINT      IDENTITY (1, 1) NOT NULL,
+    [Name] VARCHAR (50) NOT NULL,
+    CONSTRAINT [PK_Roles] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [UC_Roles_Name] UNIQUE NONCLUSTERED ([Name] ASC)
+);
+
