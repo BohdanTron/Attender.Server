@@ -5,6 +5,7 @@
     <AssemblyName>Attender.Server.API</AssemblyName>
     <RootNamespace>Attender.Server.API</RootNamespace>
     <Nullable>enable</Nullable>
+    <UserSecretsId>80fcd5d3-d25d-4237-b9d8-b99ad2cf8d4f</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
