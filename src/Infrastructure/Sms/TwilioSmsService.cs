@@ -39,6 +39,8 @@ namespace Attender.Server.Infrastructure.Sms
 
         public async Task<bool> CheckVerificationCode(string phoneNumber, string code)
         {
+            InitTwilioClient();
+
             var serviceSid = _twilioSettings.VerificationServiceSid;
 
             try
