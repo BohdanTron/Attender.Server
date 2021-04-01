@@ -7,8 +7,8 @@ pipelines:
           caches:
             - dotnetcore
           script:
-            - dotnet restore
-            - dotnet build ${SOLUTION_NAME} --no-restore --configuration Release
+            - dotnet restore ${SOLUTION_NAME}.sln
+            - dotnet build ${SOLUTION_NAME}.sln --no-restore --configuration Release
             - dotnet publish --configuration Release --no-build ./src/${WEB_PROJECT_NAME}.csproj -o ./publish
           artifacts:
             - ./publish/**
