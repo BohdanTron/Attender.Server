@@ -5,6 +5,7 @@ using Attender.Server.Application.Auth.Commands.SendVerificationPhoneCode;
 using Attender.Server.Application.Auth.Commands.VerifyPhone;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Attender.Server.API.Controllers
@@ -12,11 +13,12 @@ namespace Attender.Server.API.Controllers
     public class AuthController : ApiControllerBase
     {
         [HttpPost("send-verification-phone-code")]
+        [ProducesResponseType((int) HttpStatusCode.NoContent)]
         public async Task<ActionResult> SendVerificationPhoneCode([FromBody] SendVerificationPhoneCodeCommand command)
         {
             var result = await Mediator.Send(command);
 
-            if (result) return Ok();
+            if (result) return NoContent();
 
             return BadRequest("Phone number is invalid");
         }
