@@ -2,9 +2,9 @@
 
 namespace Attender.Server.Application.Common.Models
 {
-    public class AccessToken
+    public class Token
     {
-        public AccessToken(string value, DateTime expires)
+        public Token(string value, DateTime expires)
         {
             (Value, Expires) = (value, expires);
         }

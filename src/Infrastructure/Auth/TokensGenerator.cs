@@ -24,7 +24,7 @@ namespace Attender.Server.Infrastructure.Auth
             _authSettings = authSettings.Value;
         }
 
-        public AccessToken GenerateAccessToken()
+        public Token GenerateAccessToken()
         {
             var claims = new List<Claim>
             {
@@ -41,10 +41,10 @@ namespace Attender.Server.Infrastructure.Auth
 
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-            return new AccessToken(encodedJwt, expires);
+            return new Token(encodedJwt, expires);
         }
 
-        public async Task<(AccessToken access, string refresh)> GenerateAccessRefreshTokens(int userId, string userName)
+        public async Task<(Token access, Token refresh)> GenerateAccessRefreshTokens(int userId, string userName)
         {
             var claims = new List<Claim>
             {
@@ -63,28 +63,32 @@ namespace Attender.Server.Infrastructure.Auth
 
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-            var accessToken = new AccessToken(encodedJwt, expires);
+            var accessToken = new Token(encodedJwt, expires);
             var refreshToken = await CreateRefreshToken(userId, jwt.Id);
 
             return (accessToken, refreshToken);
         }
 
-        private async Task<string> CreateRefreshToken(int userId, string accessTokenId)
+        private async Task<Token> CreateRefreshToken(int userId, string accessTokenId)
         {
+            var expires = _authSettings.RefreshTokenLifetimeYears;
+
             var refreshToken = new RefreshToken
             {
                 AccessTokenId = accessTokenId,
                 Used = false,
                 UserId = userId,
                 AddedDate = DateTime.UtcNow,
-                ExpiryDate = DateTime.UtcNow.AddYears(_authSettings.RefreshTokenLifetimeYears),
+                ExpiryDate = DateTime.UtcNow.AddYears(expires),
                 Value = GenerateRefreshTokenValue()
             };
 
             await _dbContext.RefreshTokens.AddAsync(refreshToken);
             await _dbContext.SaveChangesAsync();
 
-            return refreshToken.Value;
+            var result = new Token(refreshToken.Value, refreshToken.ExpiryDate);
+            
+            return result;
         }
 
         private static string GenerateRefreshTokenValue()
