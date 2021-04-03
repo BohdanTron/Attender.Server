@@ -1,9 +1,9 @@
 ﻿using Attender.Server.API.Auth;
+using Attender.Server.API.Common;
 using Attender.Server.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Attender.Server.API.Controllers
@@ -27,14 +27,14 @@ namespace Attender.Server.API.Controllers
         /// <response code="400">Phone number is invalid</response>
         [HttpPost("send-verification-phone-code")]
         [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> SendVerificationPhoneCode([FromBody] SendVerificationPhoneCodeRequest request)
         {
             var sent = await _smsService.SendVerificationCodeTo(request.PhoneNumber);
 
             if (sent) return NoContent();
 
-            return BadRequest("Phone number is invalid");
+            return BadRequest(new ErrorResponse("Phone number is invalid"));
         }
 
         /// <summary>
@@ -44,12 +44,14 @@ namespace Attender.Server.API.Controllers
         /// <response code="400">Verification code is invalid</response>
         [HttpPost("verify-phone")]
         [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> VerifyPhone([FromBody] VerifyPhoneRequest request)
         {
             var isValidCode = await _smsService.CheckVerificationCode(request.PhoneNumber, request.Code);
-
-            if (!isValidCode) return BadRequest("Verification code is invalid");
+            if (!isValidCode)
+            {
+                return BadRequest(new ErrorResponse("Verification code is invalid"));
+            }
 
             var result = await _authService.LoginOrGenerateAccessToken(request.PhoneNumber);
             return Ok(new AuthResponse
@@ -67,7 +69,7 @@ namespace Attender.Server.API.Controllers
         [HttpPost("register")]
         [Authorize]
         [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(IList<string>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Register([FromBody] RegisterRequest request)
         {
             var result = await _authService.Register(request.PhoneNumber, request.UserName, request.Email);
@@ -80,7 +82,7 @@ namespace Attender.Server.API.Controllers
                 });
             }
 
-            return BadRequest(result.Errors);
+            return BadRequest(new ErrorResponse(result.Errors));
         }
 
         /// <summary>
@@ -90,7 +92,7 @@ namespace Attender.Server.API.Controllers
         /// <response code="400">Tokens are invalid</response>
         [HttpPost("refresh-token")]
         [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(IList<string>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
             var result = await _authService.RefreshToken(request.AccessToken, request.RefreshToken);
@@ -103,7 +105,7 @@ namespace Attender.Server.API.Controllers
                 });
             }
 
-            return BadRequest(result.Errors);
+            return BadRequest(new ErrorResponse(result.Errors));
         }
     }
 }
