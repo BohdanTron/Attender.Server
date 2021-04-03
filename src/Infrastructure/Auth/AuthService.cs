@@ -37,28 +37,26 @@ namespace Attender.Server.Infrastructure.Auth
                 };
             }
 
-            var role = await _dbContext.Roles.FindAsync((byte) Roles.User);
             var user = new User
             {
                 PhoneNumber = phoneNumber,
                 UserName = userName,
                 Email = email,
-                Role = role
+                RoleId = (byte) Roles.User
             };
 
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
 
-            return await Login(user.Id, user.Role.Name);
+            return await Login(user.Id, user.UserName);
         }
 
         public async Task<AuthResult> LoginOrGenerateAccessToken(string phoneNumber)
         {
             var user = await _dbContext.Users
-                .Include(u => u.Role)
                 .SingleOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
 
-            if (user is not null) return await Login(user.Id, user.Role!.Name);
+            if (user is not null) return await Login(user.Id, user.UserName);
 
             var accessToken = _tokensGenerator.GenerateAccessToken();
             return new AuthResult
@@ -83,15 +81,14 @@ namespace Attender.Server.Infrastructure.Auth
             await _dbContext.SaveChangesAsync();
 
             var user = await _dbContext.Users
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Id == storedToken.UserId);
+                .SingleAsync(u => u.Id == storedToken.UserId);
 
-            return await Login(user.Id, user.Role!.Name);
+            return await Login(user.Id, user.UserName);
         }
 
-        private async Task<AuthResult> Login(int userId, string userRole)
+        private async Task<AuthResult> Login(int userId, string userName)
         {
-            var (access, refresh) = await _tokensGenerator.GenerateAccessRefreshTokens(userId, userRole);
+            var (access, refresh) = await _tokensGenerator.GenerateAccessRefreshTokens(userId, userName);
 
             return new AuthResult
             {

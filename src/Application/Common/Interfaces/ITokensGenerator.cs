@@ -1,11 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using Attender.Server.Application.Common.Models;
+using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Common.Interfaces
 {
     public interface ITokensGenerator
     {
-        string GenerateAccessToken();
+        AccessToken GenerateAccessToken();
 
-        Task<(string access, string refresh)> GenerateAccessRefreshTokens(int userId, string userRole);
+        Task<(AccessToken access, string refresh)> GenerateAccessRefreshTokens(int userId, string userName);
     }
 }

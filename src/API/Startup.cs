@@ -1,3 +1,4 @@
+using Attender.Server.API.Constants;
 using Attender.Server.Application;
 using Attender.Server.Infrastructure;
 using Attender.Server.Infrastructure.Auth;
@@ -15,8 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
-using Attender.Server.API.Constants;
 
 namespace Attender.Server.API
 {
@@ -36,17 +37,20 @@ namespace Attender.Server.API
             services.AddInfrastructure(Configuration);
 
             services.Configure<TwilioSettings>(Configuration.GetSection("Twilio"));
-            services.Configure<JwtSettings>(Configuration.GetSection("JwtSettings"));
+            services.Configure<AuthSettings>(Configuration.GetSection("AuthSettings"));
 
             services.AddRouting(options => options.LowercaseUrls = true);
 
-            var key = Encoding.ASCII.GetBytes(Configuration["JwtSettings:SecurityKey"]);
+            var issuer = Configuration["AuthSettings:Issuer"];
+            var key = Encoding.ASCII.GetBytes(Configuration["AuthSettings:SecurityKey"]);
 
             var tokenParameters = new TokenValidationParameters
             {
-                ValidateIssuer = false,
+                ValidateIssuer = true,
+                ValidIssuer = issuer,
                 ValidateAudience = false,
                 ValidateLifetime = true,
+                ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha512Signature },
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ClockSkew = TimeSpan.Zero,
@@ -70,7 +74,7 @@ namespace Attender.Server.API
             services.AddAuthorization(options =>
             {
                 options.AddPolicy(AuthConstants.Policy.RegisteredOnly,
-                    policy => policy.RequireRole(AuthConstants.Role.Admin, AuthConstants.Role.User));
+                    policy => policy.RequireClaim(ClaimsIdentity.DefaultNameClaimType));
             });
 
             services.AddControllers(options =>
@@ -119,7 +123,7 @@ namespace Attender.Server.API
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                
+
             }
 
             app.UseSwagger();

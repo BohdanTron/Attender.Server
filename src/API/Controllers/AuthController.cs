@@ -1,8 +1,5 @@
-﻿using Attender.Server.Application.Auth.Commands.LoginOrGenerateToken;
-using Attender.Server.Application.Auth.Commands.RefreshToken;
-using Attender.Server.Application.Auth.Commands.RegisterUser;
-using Attender.Server.Application.Auth.Commands.SendVerificationPhoneCode;
-using Attender.Server.Application.Auth.Commands.VerifyPhone;
+﻿using Attender.Server.API.Auth;
+using Attender.Server.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -12,32 +9,40 @@ namespace Attender.Server.API.Controllers
 {
     public class AuthController : ApiControllerBase
     {
+        private readonly IAuthService _authService;
+        private readonly ISmsService _smsService;
+
+        public AuthController(IAuthService authService, ISmsService smsService)
+        {
+            _authService = authService;
+            _smsService = smsService;
+        }
+
         [HttpPost("send-verification-phone-code")]
         [ProducesResponseType((int) HttpStatusCode.NoContent)]
-        public async Task<ActionResult> SendVerificationPhoneCode([FromBody] SendVerificationPhoneCodeCommand command)
+        public async Task<ActionResult> SendVerificationPhoneCode([FromBody] SendVerificationPhoneCodeRequest request)
         {
-            var result = await Mediator.Send(command);
+            var sent = await _smsService.SendVerificationCodeTo(request.PhoneNumber);
 
-            if (result) return NoContent();
+            if (sent) return NoContent();
 
             return BadRequest("Phone number is invalid");
         }
 
         [HttpPost("verify-phone")]
-        public async Task<ActionResult> VerifyPhone([FromBody] VerifyPhoneCommand command)
+        public async Task<ActionResult> VerifyPhone([FromBody] VerifyPhoneRequest request)
         {
-            var isValidCode = await Mediator.Send(command);
+            var isValidCode = await _smsService.CheckVerificationCode(request.PhoneNumber, request.Code);
 
             if (!isValidCode) return BadRequest("Verification code is invalid");
 
-            var result = await Mediator.Send(new LoginOrGenerateTokenCommand { PhoneNumber = command.PhoneNumber });
+            var result = await _authService.LoginOrGenerateAccessToken(request.PhoneNumber);
             if (result.Success)
             {
-                //TODO: Consider moving to separate method/class
-                return Ok(new
+                return Ok(new AuthResponse
                 {
-                    accessToken = result.AccessToken,
-                    refreshToken = result.RefreshToken
+                    AccessToken = result.AccessToken,
+                    RefreshToken = result.RefreshToken
                 });
             }
 
@@ -46,15 +51,15 @@ namespace Attender.Server.API.Controllers
 
         [HttpPost("register")]
         [Authorize]
-        public async Task<ActionResult> Register([FromBody] RegisterUserCommand command)
+        public async Task<ActionResult> Register([FromBody] RegisterRequest request)
         {
-            var result = await Mediator.Send(command);
+            var result = await _authService.Register(request.PhoneNumber, request.UserName, request.Email);
             if (result.Success)
             {
-                return Ok(new
+                return Ok(new AuthResponse
                 {
-                    accessToken = result.AccessToken,
-                    refreshToken = result.RefreshToken
+                    AccessToken = result.AccessToken,
+                    RefreshToken = result.RefreshToken
                 });
             }
 
@@ -62,15 +67,15 @@ namespace Attender.Server.API.Controllers
         }
 
         [HttpPost("refresh-token")]
-        public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenCommand command)
+        public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
-            var result = await Mediator.Send(command);
+            var result = await _authService.RefreshToken(request.AccessToken, request.RefreshToken);
             if (result.Success)
             {
-                return Ok(new
+                return Ok(new AuthResponse
                 {
-                    accessToken = result.AccessToken,
-                    refreshToken = result.RefreshToken
+                    AccessToken = result.AccessToken,
+                    RefreshToken = result.RefreshToken
                 });
             }
 

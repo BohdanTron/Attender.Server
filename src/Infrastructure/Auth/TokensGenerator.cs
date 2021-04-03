@@ -1,4 +1,5 @@
 ﻿using Attender.Server.Application.Common.Interfaces;
+using Attender.Server.Application.Common.Models;
 using Attender.Server.Domain.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -15,49 +16,60 @@ namespace Attender.Server.Infrastructure.Auth
     public class TokensGenerator : ITokensGenerator
     {
         private readonly IAttenderDbContext _dbContext;
-        private readonly JwtSettings _jwtSettings;
+        private readonly AuthSettings _authSettings;
 
-        public TokensGenerator(IAttenderDbContext dbContext, IOptions<JwtSettings> jwtSettings)
+        public TokensGenerator(IAttenderDbContext dbContext, IOptions<AuthSettings> authSettings)
         {
             _dbContext = dbContext;
-            _jwtSettings = jwtSettings.Value;
+            _authSettings = authSettings.Value;
         }
 
-        public string GenerateAccessToken()
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSettings.SecurityKey));
-
-            var jwt = new JwtSecurityToken(
-                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.LifetimeMinutes),
-                signingCredentials: new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512Signature));
-
-            var accessToken = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-            return accessToken;
-        }
-
-        public async Task<(string access, string refresh)> GenerateAccessRefreshTokens(int userId, string userRole)
+        public AccessToken GenerateAccessToken()
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimsIdentity.DefaultRoleClaimType, userRole),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(JwtRegisteredClaimNames.Iss, _authSettings.Issuer)
             };
 
-            var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSettings.SecurityKey));
+            var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_authSettings.SecurityKey));
+            var expires = DateTime.UtcNow.AddMinutes(_authSettings.LifetimeMinutes);
 
             var jwt = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.LifetimeMinutes),
+                expires: expires,
                 signingCredentials: new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512Signature));
 
-            var accessToken = new JwtSecurityTokenHandler().WriteToken(jwt);
-            var refreshToken = await GenerateRefreshToken(userId, jwt.Id);
+            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+            return new AccessToken(encodedJwt, expires);
+        }
+
+        public async Task<(AccessToken access, string refresh)> GenerateAccessRefreshTokens(int userId, string userName)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Iss, _authSettings.Issuer),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimsIdentity.DefaultNameClaimType, userName),
+            };
+
+            var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_authSettings.SecurityKey));
+            var expires = DateTime.UtcNow.AddMinutes(_authSettings.LifetimeMinutes);
+
+            var jwt = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(_authSettings.LifetimeMinutes),
+                signingCredentials: new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512Signature));
+
+            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+            var accessToken = new AccessToken(encodedJwt, expires);
+            var refreshToken = await CreateRefreshToken(userId, jwt.Id);
 
             return (accessToken, refreshToken);
         }
 
-        private async Task<string> GenerateRefreshToken(int userId, string accessTokenId)
+        private async Task<string> CreateRefreshToken(int userId, string accessTokenId)
         {
             var refreshToken = new RefreshToken
             {
@@ -65,7 +77,7 @@ namespace Attender.Server.Infrastructure.Auth
                 Used = false,
                 UserId = userId,
                 AddedDate = DateTime.UtcNow,
-                ExpiryDate = DateTime.UtcNow.AddYears(_jwtSettings.RefreshTokenLifetimeYears),
+                ExpiryDate = DateTime.UtcNow.AddYears(_authSettings.RefreshTokenLifetimeYears),
                 Value = GenerateRefreshTokenValue()
             };
 
