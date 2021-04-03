@@ -33,7 +33,7 @@ namespace Attender.Server.Infrastructure.Auth
                 return new AuthResult
                 {
                     Success = false,
-                    Errors = new[] { "User already exist" }
+                    Errors = new[] { "User with such settings already exists" }
                 };
             }
 

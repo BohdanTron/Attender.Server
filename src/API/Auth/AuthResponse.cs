@@ -1,10 +1,13 @@
 ﻿using Attender.Server.Application.Common.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace Attender.Server.API.Auth
 {
     public class AuthResponse
     {
-        public AccessToken? AccessToken { get; set; }
+        [Required]
+        public AccessToken AccessToken { get; set; } = default!;
+
         public string? RefreshToken { get; set; }
     }
 }
