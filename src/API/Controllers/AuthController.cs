@@ -54,11 +54,8 @@ namespace Attender.Server.API.Controllers
             }
 
             var result = await _authService.LoginOrGenerateAccessToken(request.PhoneNumber);
-            return Ok(new AuthResponse
-            {
-                AccessToken = result.AccessToken,
-                RefreshToken = result.RefreshToken
-            });
+
+            return Ok(new AuthResponse(result.AccessToken, result.RefreshToken));
         }
 
         /// <summary>
@@ -75,11 +72,7 @@ namespace Attender.Server.API.Controllers
             var result = await _authService.Register(request.PhoneNumber, request.UserName, request.Email);
             if (result.Success)
             {
-                return Ok(new AuthResponse
-                {
-                    AccessToken = result.AccessToken,
-                    RefreshToken = result.RefreshToken
-                });
+                return Ok(new AuthResponse(result.AccessToken, result.RefreshToken));
             }
 
             return BadRequest(new ErrorResponse(result.Errors));
@@ -98,11 +91,7 @@ namespace Attender.Server.API.Controllers
             var result = await _authService.RefreshToken(request.AccessToken, request.RefreshToken);
             if (result.Success)
             {
-                return Ok(new AuthResponse
-                {
-                    AccessToken = result.AccessToken,
-                    RefreshToken = result.RefreshToken
-                });
+                return Ok(new AuthResponse(result.AccessToken, result.RefreshToken));
             }
 
             return BadRequest(new ErrorResponse(result.Errors));

@@ -2,12 +2,12 @@
 
 namespace Attender.Server.API.Auth
 {
-    public class RefreshTokenRequest
+    public record RefreshTokenRequest
     {
-        [Required]
-        public string AccessToken { get; set; } = string.Empty;
+        [Required] 
+        public string AccessToken { get; init; } = null!;
 
         [Required]
-        public string RefreshToken { get; set; } = string.Empty;
+        public string RefreshToken { get; init; } = null!;
     }
 }

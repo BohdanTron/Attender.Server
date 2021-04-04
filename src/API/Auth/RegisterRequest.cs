@@ -2,14 +2,14 @@
 
 namespace Attender.Server.API.Auth
 {
-    public class RegisterRequest
+    public record RegisterRequest
     {
-        [Required]
-        public string UserName { get; set; } = string.Empty;
+        [Required] 
+        public string UserName { get; init; } = null!;
 
         [Required]
-        public string PhoneNumber { get; set; } = string.Empty;
+        public string PhoneNumber { get; init; } = null!;
 
-        public string? Email { get; set; }
+        public string? Email { get; init; }
     }
 }

@@ -4,8 +4,11 @@ namespace Attender.Server.API.Auth
 {
     public class AuthResponse
     {
-        public Token AccessToken { get; set; } = default!;
+        public AuthResponse(Token accessToken, Token? refreshToken = null) 
+            => (AccessToken, RefreshToken) = (accessToken, refreshToken);
 
-        public Token? RefreshToken { get; set; }
+        public Token AccessToken { get; }
+
+        public Token? RefreshToken { get; }
     }
 }

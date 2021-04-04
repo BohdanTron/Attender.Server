@@ -2,10 +2,10 @@
 
 namespace Attender.Server.API.Auth
 {
-    public class SendVerificationPhoneCodeRequest
+    public record SendVerificationPhoneCodeRequest
     {
         //TODO: Add phone format validation
         [Required]
-        public string PhoneNumber { get; set; } = string.Empty;
+        public string PhoneNumber { get; init; } = null!;
     }
 }

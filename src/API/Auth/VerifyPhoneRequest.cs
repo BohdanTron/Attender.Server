@@ -2,12 +2,12 @@
 
 namespace Attender.Server.API.Auth
 {
-    public class VerifyPhoneRequest
+    public record VerifyPhoneRequest
     {
         [Required]
-        public string PhoneNumber { get; set; } = string.Empty;
+        public string PhoneNumber { get; init; } = null!;
 
         [Required]
-        public string Code { get; set; } = string.Empty;
+        public string Code { get; init; } = null!;
     }
 }
