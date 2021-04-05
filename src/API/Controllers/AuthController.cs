@@ -1,6 +1,7 @@
 ﻿using Attender.Server.API.Auth;
 using Attender.Server.API.Common;
 using Attender.Server.Application.Common.Interfaces;
+using Attender.Server.Application.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +27,7 @@ namespace Attender.Server.API.Controllers
         /// <response code="204">Verification code successfully sent</response>
         /// <response code="400">Phone number is invalid</response>
         [HttpPost("send-verification-phone-code")]
-        [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> SendVerificationPhoneCode([FromBody] SendVerificationPhoneCodeRequest request)
         {
@@ -43,7 +44,7 @@ namespace Attender.Server.API.Controllers
         /// <response code="200">Phone number successfully verified</response>
         /// <response code="400">Verification code is invalid</response>
         [HttpPost("verify-phone")]
-        [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AuthTokens), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> VerifyPhone([FromBody] VerifyPhoneRequest request)
         {
@@ -55,7 +56,7 @@ namespace Attender.Server.API.Controllers
 
             var result = await _authService.LoginOrGenerateAccessToken(request.PhoneNumber);
 
-            return Ok(new AuthResponse(result.AccessToken, result.RefreshToken));
+            return Ok(result);
         }
 
         /// <summary>
@@ -65,14 +66,14 @@ namespace Attender.Server.API.Controllers
         /// <response code="400">User with such settings already exists</response>
         [HttpPost("register")]
         [Authorize]
-        [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AuthTokens), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Register([FromBody] RegisterRequest request)
         {
             var result = await _authService.Register(request.PhoneNumber, request.UserName, request.Email);
-            if (result.Success)
+            if (result.Succeeded)
             {
-                return Ok(new AuthResponse(result.AccessToken, result.RefreshToken));
+                return Ok(result.Data);
             }
 
             return BadRequest(new ErrorResponse(result.Errors));
@@ -84,14 +85,14 @@ namespace Attender.Server.API.Controllers
         /// <response code="200">Pair of access/refresh tokens successfully generated</response>
         /// <response code="400">Tokens are invalid</response>
         [HttpPost("refresh-token")]
-        [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AuthTokens), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
             var result = await _authService.RefreshToken(request.AccessToken, request.RefreshToken);
-            if (result.Success)
+            if (result.Succeeded)
             {
-                return Ok(new AuthResponse(result.AccessToken, result.RefreshToken));
+                return Ok(result.Data);
             }
 
             return BadRequest(new ErrorResponse(result.Errors));

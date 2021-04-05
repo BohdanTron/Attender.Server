@@ -23,18 +23,14 @@ namespace Attender.Server.Infrastructure.Auth
             _tokensValidator = tokensValidator;
         }
 
-        public async Task<AuthResult> Register(string phoneNumber, string userName, string? email)
+        public async Task<Result<AuthTokens>> Register(string phoneNumber, string userName, string? email)
         {
             var exists = await _dbContext.Users.AnyAsync(u =>
                 u.PhoneNumber == phoneNumber || u.UserName == userName || email != null && u.Email == email);
 
             if (exists)
             {
-                return new AuthResult
-                {
-                    Success = false,
-                    Errors = new[] { "User with such settings already exists" }
-                };
+                return Result.Failure<AuthTokens>("User with such settings already exists");
             }
 
             var user = new User
@@ -48,10 +44,12 @@ namespace Attender.Server.Infrastructure.Auth
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
 
-            return await Login(user.Id, user.UserName);
+            var tokens = await Login(user.Id, user.UserName);
+
+            return Result.Succeeded(tokens);
         }
 
-        public async Task<AuthResult> LoginOrGenerateAccessToken(string phoneNumber)
+        public async Task<AuthTokens> LoginOrGenerateAccessToken(string phoneNumber)
         {
             var user = await _dbContext.Users
                 .SingleOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
@@ -59,43 +57,37 @@ namespace Attender.Server.Infrastructure.Auth
             if (user is not null) return await Login(user.Id, user.UserName);
 
             var accessToken = _tokensGenerator.GenerateAccessToken();
-            return new AuthResult
-            {
-                Success = true,
-                AccessToken = accessToken
-            };
+
+            return new AuthTokens(accessToken);
         }
 
-        public async Task<AuthResult> RefreshToken(string accessToken, string refreshToken)
+        public async Task<Result<AuthTokens>> RefreshToken(string accessToken, string refreshToken)
         {
             var validation = await _tokensValidator.ValidateRefreshToken(accessToken, refreshToken);
-            if (!validation.Success)
+            if (!validation.Succeeded)
             {
-                return new AuthResult { Errors = validation.Errors };
+                return Result.Failure<AuthTokens>(validation.Errors);
             }
 
-            var storedToken = validation.StoredToken;
+            var storedToken = validation.Data;
 
-            storedToken.Used = true;
+            storedToken!.Used = true;
             _dbContext.RefreshTokens.Update(storedToken);
             await _dbContext.SaveChangesAsync();
 
             var user = await _dbContext.Users
                 .SingleAsync(u => u.Id == storedToken.UserId);
 
-            return await Login(user.Id, user.UserName);
+            var tokens = await Login(user.Id, user.UserName);
+
+            return Result.Succeeded(tokens);
         }
 
-        private async Task<AuthResult> Login(int userId, string userName)
+        private async Task<AuthTokens> Login(int userId, string userName)
         {
             var (access, refresh) = await _tokensGenerator.GenerateAccessRefreshTokens(userId, userName);
 
-            return new AuthResult
-            {
-                Success = true,
-                AccessToken = access,
-                RefreshToken = refresh
-            };
+            return new AuthTokens(access, refresh);
         }
     }
 }

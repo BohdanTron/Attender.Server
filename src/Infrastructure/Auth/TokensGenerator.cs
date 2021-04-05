@@ -28,7 +28,7 @@ namespace Attender.Server.Infrastructure.Auth
         {
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Iss, _authSettings.Issuer)
+                new(JwtRegisteredClaimNames.Iss, _authSettings.Issuer)
             };
 
             return GenerateAccessToken(claims);
@@ -40,9 +40,9 @@ namespace Attender.Server.Infrastructure.Auth
 
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Iss, _authSettings.Issuer),
-                new Claim(JwtRegisteredClaimNames.Jti, jwtId),
-                new Claim(ClaimsIdentity.DefaultNameClaimType, userName),
+                new(JwtRegisteredClaimNames.Iss, _authSettings.Issuer),
+                new(JwtRegisteredClaimNames.Jti, jwtId),
+                new(ClaimsIdentity.DefaultNameClaimType, userName),
             };
 
             var accessToken = GenerateAccessToken(claims);

@@ -9,7 +9,7 @@ namespace Attender.Server.API
         {
             return value is null
                 ? null
-                : Regex.Replace(value.ToString(), "([a-z])([A-Z])", "$1-$2").ToLower();
+                : Regex.Replace(value.ToString() ?? string.Empty, "([a-z])([A-Z])", "$1-$2").ToLower();
         }
     }
 }

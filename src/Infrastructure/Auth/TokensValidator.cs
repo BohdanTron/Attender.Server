@@ -1,5 +1,6 @@
 ﻿using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
+using Attender.Server.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -24,12 +25,12 @@ namespace Attender.Server.Infrastructure.Auth
             _tokenValidationParameters = tokenValidationParameters;
         }
 
-        public async Task<ValidationTokenResult> ValidateRefreshToken(string accessToken, string refreshToken)
+        public async Task<Result<RefreshToken>> ValidateRefreshToken(string accessToken, string refreshToken)
         {
             var principal = GetPrincipalFromToken(accessToken, out var errorMessage);
             if (principal is null)
             {
-                return new ValidationTokenResult { Errors = new[] { errorMessage } };
+                return Result.Failure<RefreshToken>(errorMessage);
             }
 
             var expiration = long.Parse(principal.Claims.Single(c => c.Type == JwtRegisteredClaimNames.Exp).Value);
@@ -38,36 +39,32 @@ namespace Attender.Server.Infrastructure.Auth
 
             if (expirationDate > DateTime.UtcNow)
             {
-                return new ValidationTokenResult { Errors = new[] { "Token hasn't expired yet" } };
+                return Result.Failure<RefreshToken>("Token hasn't expired yet");
             }
 
             var storedToken = await _context.RefreshTokens.FirstOrDefaultAsync(r => r.Value == refreshToken);
             if (storedToken is null)
             {
-                return new ValidationTokenResult { Errors = new[] { "Refresh token doesn't exist" } };
+                return Result.Failure<RefreshToken>("Refresh token doesn't exist");
             }
 
             if (DateTime.UtcNow > storedToken.ExpiryDate)
             {
-                return new ValidationTokenResult { Errors = new[] { "Refresh token has expired" } };
+                return Result.Failure<RefreshToken>("Refresh token has expired");
             }
 
             if (storedToken.Used)
             {
-                return new ValidationTokenResult { Errors = new[] { "Refresh token has been used" } };
+                return Result.Failure<RefreshToken>("Refresh token has been used");
             }
 
             var jti = principal.Claims.Single(c => c.Type == JwtRegisteredClaimNames.Jti);
             if (jti.Value != storedToken.AccessTokenId)
             {
-                return new ValidationTokenResult { Errors = new[] { "Refresh token doesn't match JWT" } };
+                return Result.Failure<RefreshToken>("Refresh token doesn't match JWT");
             }
 
-            return new ValidationTokenResult
-            {
-                Success = true,
-                StoredToken = storedToken
-            };
+            return Result.Succeeded(storedToken);
         }
 
         private ClaimsPrincipal? GetPrincipalFromToken(string token, out string errorMessage)

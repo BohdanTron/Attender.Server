@@ -5,8 +5,8 @@ namespace Attender.Server.Application.Common.Interfaces
 {
     public interface IAuthService
     {
-        Task<AuthResult> Register(string phoneNumber, string userName, string? email);
-        Task<AuthResult> LoginOrGenerateAccessToken(string phoneNumber);
-        Task<AuthResult> RefreshToken(string accessToken, string refreshToken);
+        Task<Result<AuthTokens>> Register(string phoneNumber, string userName, string? email);
+        Task<AuthTokens> LoginOrGenerateAccessToken(string phoneNumber);
+        Task<Result<AuthTokens>> RefreshToken(string accessToken, string refreshToken);
     }
 }
