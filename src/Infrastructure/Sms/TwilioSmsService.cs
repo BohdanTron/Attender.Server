@@ -10,24 +10,23 @@ namespace Attender.Server.Infrastructure.Sms
 {
     public class TwilioSmsService : ISmsService
     {
-        private readonly TwilioSettings _twilioSettings;
+        private readonly TwilioOptions _twilioOptions;
 
-        public TwilioSmsService(IOptions<TwilioSettings> twilioSettings)
+        public TwilioSmsService(IOptions<TwilioOptions> twilioOptions)
         {
-            _twilioSettings = twilioSettings.Value;
+            _twilioOptions = twilioOptions.Value;
         }
 
         public async Task<Result<string>> SendVerificationCodeTo(string phoneNumber)
         {
             InitTwilioClient();
 
-            var serviceSid = _twilioSettings.VerificationServiceSid;
-
+            var serviceSid = _twilioOptions.VerificationServiceSid;
             try
             {
                 var verification = await VerificationResource.CreateAsync(
                     to: phoneNumber,
-                    channel: "sms",
+                    channel: TwilioConstants.Channel.Sms,
                     pathServiceSid: serviceSid);
 
                 var status = verification.Status;
@@ -40,9 +39,9 @@ namespace Attender.Server.Infrastructure.Sms
             {
                 switch (e.Code)
                 {
-                    case 60200:
-                        return Result.Failure<string>("Phone number is invalid");
-                    case 60203:
+                    case (int) TwilioErrorCodes.InvalidParameter:
+                        return Result.Failure<string>("Phone number has incorrect format");
+                    case (int) TwilioErrorCodes.MaxAttemptsReached:
                         return Result.Failure<string>("Max attempts reached");
                     default:
                         throw;
@@ -54,8 +53,7 @@ namespace Attender.Server.Infrastructure.Sms
         {
             InitTwilioClient();
 
-            var serviceSid = _twilioSettings.VerificationServiceSid;
-
+            var serviceSid = _twilioOptions.VerificationServiceSid;
             try
             {
                 var verification = await VerificationCheckResource.CreateAsync(
@@ -73,9 +71,9 @@ namespace Attender.Server.Infrastructure.Sms
             {
                 switch (e.Code)
                 {
-                    case 60200:
+                    case (int) TwilioErrorCodes.InvalidParameter:
                         return Result.Failure<string>("Phone number or verification code has incorrect format");
-                    case 20404:
+                    case (int) TwilioErrorCodes.ResourceNotFound:
                         return Result.Failure<string>("Verification code already approved");
                     default:
                         throw;
@@ -85,8 +83,8 @@ namespace Attender.Server.Infrastructure.Sms
 
         private void InitTwilioClient()
         {
-            var accountSid = _twilioSettings.AccountSid;
-            var authToken = _twilioSettings.AuthToken;
+            var accountSid = _twilioOptions.AccountSid;
+            var authToken = _twilioOptions.AuthToken;
 
             TwilioClient.Init(accountSid, authToken);
         }

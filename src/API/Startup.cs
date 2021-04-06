@@ -36,7 +36,7 @@ namespace Attender.Server.API
             services.AddApplication();
             services.AddInfrastructure(Configuration);
 
-            services.Configure<TwilioSettings>(Configuration.GetSection("Twilio"));
+            services.Configure<TwilioOptions>(Configuration.GetSection("Twilio"));
             services.Configure<AuthSettings>(Configuration.GetSection("AuthSettings"));
 
             services.AddRouting(options => options.LowercaseUrls = true);
