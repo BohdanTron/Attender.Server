@@ -37,12 +37,12 @@ namespace Attender.Server.API
             services.AddInfrastructure(Configuration);
 
             services.Configure<TwilioOptions>(Configuration.GetSection("Twilio"));
-            services.Configure<AuthSettings>(Configuration.GetSection("AuthSettings"));
+            services.Configure<AuthOptions>(Configuration.GetSection("Auth"));
 
             services.AddRouting(options => options.LowercaseUrls = true);
 
-            var issuer = Configuration["AuthSettings:Issuer"];
-            var key = Encoding.ASCII.GetBytes(Configuration["AuthSettings:SecurityKey"]);
+            var issuer = Configuration["Auth:Issuer"];
+            var key = Encoding.ASCII.GetBytes(Configuration["Auth:SecurityKey"]);
 
             var tokenParameters = new TokenValidationParameters
             {
@@ -50,7 +50,7 @@ namespace Attender.Server.API
                 ValidIssuer = issuer,
                 ValidateAudience = false,
                 ValidateLifetime = true,
-                ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha512Signature },
+                ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha256Signature },
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ClockSkew = TimeSpan.Zero,

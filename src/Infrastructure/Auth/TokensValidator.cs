@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Infrastructure.Auth
 {
-    //TODO: Consider removing interface and creating static class instead
     public class TokensValidator : ITokensValidator
     {
         private readonly IAttenderDbContext _context;
@@ -36,7 +35,6 @@ namespace Attender.Server.Infrastructure.Auth
             var expiration = long.Parse(principal.Claims.Single(c => c.Type == JwtRegisteredClaimNames.Exp).Value);
 
             var expirationDate = DateTime.UnixEpoch.AddSeconds(expiration);
-
             if (expirationDate > DateTime.UtcNow)
             {
                 return Result.Failure<RefreshToken>("Token hasn't expired yet");
@@ -90,7 +88,7 @@ namespace Attender.Server.Infrastructure.Auth
         private static bool ValidateTokenAlgorithm(SecurityToken token)
         {
             return token is JwtSecurityToken jwt &&
-                   jwt.Header.Alg.Equals(SecurityAlgorithms.HmacSha512Signature, StringComparison.InvariantCultureIgnoreCase);
+                   jwt.Header.Alg.Equals(SecurityAlgorithms.HmacSha256Signature, StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }

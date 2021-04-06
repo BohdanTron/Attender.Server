@@ -44,8 +44,7 @@ namespace Attender.Server.Infrastructure.Auth
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
 
-            var tokens = await Login(user.Id, user.UserName);
-
+            var tokens = await _tokensGenerator.GenerateAuthTokens(user.Id, user.UserName);
             return Result.Success(tokens);
         }
 
@@ -54,10 +53,12 @@ namespace Attender.Server.Infrastructure.Auth
             var user = await _dbContext.Users
                 .SingleOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
 
-            if (user is not null) return await Login(user.Id, user.UserName);
+            if (user is not null)
+            {
+                return await _tokensGenerator.GenerateAuthTokens(user.Id, user.UserName);
+            }
 
             var accessToken = _tokensGenerator.GenerateAccessToken();
-
             return new AuthTokens(accessToken);
         }
 
@@ -78,16 +79,8 @@ namespace Attender.Server.Infrastructure.Auth
             var user = await _dbContext.Users
                 .SingleAsync(u => u.Id == storedToken.UserId);
 
-            var tokens = await Login(user.Id, user.UserName);
-
+            var tokens = await _tokensGenerator.GenerateAuthTokens(user.Id, user.UserName);
             return Result.Success(tokens);
-        }
-
-        private async Task<AuthTokens> Login(int userId, string userName)
-        {
-            var (access, refresh) = await _tokensGenerator.GenerateAccessRefreshTokens(userId, userName);
-
-            return new AuthTokens(access, refresh);
         }
     }
 }

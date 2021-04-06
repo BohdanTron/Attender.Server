@@ -5,11 +5,12 @@ using Attender.Server.Application.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Mime;
 using System.Threading.Tasks;
 
 namespace Attender.Server.API.Controllers
 {
-    [Produces("application/json")]
+    [Produces(MediaTypeNames.Application.Json)]
     public class AuthController : ApiControllerBase
     {
         private readonly IAuthService _authService;
@@ -71,10 +72,8 @@ namespace Attender.Server.API.Controllers
         public async Task<ActionResult> Register([FromBody] RegisterRequest request)
         {
             var result = await _authService.Register(request.PhoneNumber, request.UserName, request.Email);
-            if (result.Succeeded)
-            {
-                return Ok(result.Data);
-            }
+
+            if (result.Succeeded) return Ok(result.Data);
 
             return BadRequest(new ErrorResponse(result.Errors));
         }
@@ -90,10 +89,8 @@ namespace Attender.Server.API.Controllers
         public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
             var result = await _authService.RefreshToken(request.AccessToken, request.RefreshToken);
-            if (result.Succeeded)
-            {
-                return Ok(result.Data);
-            }
+
+            if (result.Succeeded) return Ok(result.Data);
 
             return BadRequest(new ErrorResponse(result.Errors));
         }

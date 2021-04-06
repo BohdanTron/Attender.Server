@@ -7,6 +7,6 @@ namespace Attender.Server.Application.Common.Interfaces
     {
         Token GenerateAccessToken();
 
-        Task<(Token access, Token refresh)> GenerateAccessRefreshTokens(int userId, string userName);
+        Task<AuthTokens> GenerateAuthTokens(int userId, string userName);
     }
 }

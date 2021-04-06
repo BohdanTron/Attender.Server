@@ -16,31 +16,31 @@ namespace Attender.Server.Infrastructure.Auth
     public class TokensGenerator : ITokensGenerator
     {
         private readonly IAttenderDbContext _dbContext;
-        private readonly AuthSettings _authSettings;
+        private readonly AuthOptions _authOptions;
 
-        public TokensGenerator(IAttenderDbContext dbContext, IOptions<AuthSettings> authSettings)
+        public TokensGenerator(IAttenderDbContext dbContext, IOptions<AuthOptions> authOptions)
         {
             _dbContext = dbContext;
-            _authSettings = authSettings.Value;
+            _authOptions = authOptions.Value;
         }
 
         public Token GenerateAccessToken()
         {
             var claims = new List<Claim>
             {
-                new(JwtRegisteredClaimNames.Iss, _authSettings.Issuer)
+                new(JwtRegisteredClaimNames.Iss, _authOptions.Issuer)
             };
 
             return GenerateAccessToken(claims);
         }
 
-        public async Task<(Token access, Token refresh)> GenerateAccessRefreshTokens(int userId, string userName)
+        public async Task<AuthTokens> GenerateAuthTokens(int userId, string userName)
         {
             var jwtId = Guid.NewGuid().ToString();
 
             var claims = new List<Claim>
             {
-                new(JwtRegisteredClaimNames.Iss, _authSettings.Issuer),
+                new(JwtRegisteredClaimNames.Iss, _authOptions.Issuer),
                 new(JwtRegisteredClaimNames.Jti, jwtId),
                 new(ClaimsIdentity.DefaultNameClaimType, userName),
             };
@@ -48,27 +48,26 @@ namespace Attender.Server.Infrastructure.Auth
             var accessToken = GenerateAccessToken(claims);
             var refreshToken = await CreateRefreshToken(userId, jwtId);
 
-            return (accessToken, refreshToken);
+            return new AuthTokens(accessToken, refreshToken);
         }
 
         private Token GenerateAccessToken(IEnumerable<Claim> claims)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_authSettings.SecurityKey));
-            var expires = DateTime.UtcNow.AddMinutes(_authSettings.LifetimeMinutes);
+            var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_authOptions.SecurityKey));
+            var expires = DateTime.UtcNow.AddMinutes(_authOptions.LifetimeMinutes);
 
             var jwt = new JwtSecurityToken(
                 claims: claims,
                 expires: expires,
-                signingCredentials: new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512Signature));
+                signingCredentials: new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature));
 
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
             return new Token(encodedJwt, expires);
         }
 
         private async Task<Token> CreateRefreshToken(int userId, string accessTokenId)
         {
-            var expires = _authSettings.RefreshTokenLifetimeYears;
+            var expires = _authOptions.RefreshTokenLifetimeYears;
 
             var refreshToken = new RefreshToken
             {
@@ -84,7 +83,6 @@ namespace Attender.Server.Infrastructure.Auth
             await _dbContext.SaveChangesAsync();
 
             var result = new Token(refreshToken.Value, refreshToken.ExpiryDate);
-
             return result;
         }
 
