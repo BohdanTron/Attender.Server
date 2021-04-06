@@ -46,7 +46,7 @@ namespace Attender.Server.Infrastructure.Auth
 
             var tokens = await Login(user.Id, user.UserName);
 
-            return Result.Succeeded(tokens);
+            return Result.Success(tokens);
         }
 
         public async Task<AuthTokens> LoginOrGenerateAccessToken(string phoneNumber)
@@ -80,7 +80,7 @@ namespace Attender.Server.Infrastructure.Auth
 
             var tokens = await Login(user.Id, user.UserName);
 
-            return Result.Succeeded(tokens);
+            return Result.Success(tokens);
         }
 
         private async Task<AuthTokens> Login(int userId, string userName)

@@ -6,7 +6,7 @@ namespace Attender.Server.Application.Common.Models
 {
     public static class Result
     {
-        public static Result<T> Succeeded<T>(T data)
+        public static Result<T> Success<T>(T data)
         {
             return new(true, data, Array.Empty<string>());
         }

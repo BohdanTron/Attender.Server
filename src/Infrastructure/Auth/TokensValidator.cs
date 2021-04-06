@@ -64,7 +64,7 @@ namespace Attender.Server.Infrastructure.Auth
                 return Result.Failure<RefreshToken>("Refresh token doesn't match JWT");
             }
 
-            return Result.Succeeded(storedToken);
+            return Result.Success(storedToken);
         }
 
         private ClaimsPrincipal? GetPrincipalFromToken(string token, out string errorMessage)

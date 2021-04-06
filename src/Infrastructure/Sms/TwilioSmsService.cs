@@ -33,7 +33,7 @@ namespace Attender.Server.Infrastructure.Sms
                 var status = verification.Status;
 
                 return status == TwilioConstants.Status.Pending
-                    ? Result.Succeeded(status)
+                    ? Result.Success(status)
                     : Result.Failure<string>("Verification code was not sent");
             }
             catch (ApiException e)
@@ -66,7 +66,7 @@ namespace Attender.Server.Infrastructure.Sms
                 var status = verification.Status;
 
                 return status == TwilioConstants.Status.Approved
-                    ? Result.Succeeded(status)
+                    ? Result.Success(status)
                     : Result.Failure<string>("Verification code is incorrect");
             }
             catch (ApiException e)
