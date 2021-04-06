@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using Attender.Server.Application.Common.Models;
+using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Common.Interfaces
 {
     public interface ISmsService
     {
-        Task<bool> SendVerificationCodeTo(string phoneNumber);
-        Task<bool> CheckVerificationCode(string phoneNumber, string code);
+        Task<Result<string>> SendVerificationCodeTo(string phoneNumber);
+        Task<Result<string>> CheckVerificationCode(string phoneNumber, string code);
     }
 }

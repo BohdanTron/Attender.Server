@@ -1,4 +1,5 @@
 ﻿using Attender.Server.Application.Common.Interfaces;
+using Attender.Server.Application.Common.Models;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 using Twilio;
@@ -16,7 +17,7 @@ namespace Attender.Server.Infrastructure.Sms
             _twilioSettings = twilioSettings.Value;
         }
 
-        public async Task<bool> SendVerificationCodeTo(string phoneNumber)
+        public async Task<Result<string>> SendVerificationCodeTo(string phoneNumber)
         {
             InitTwilioClient();
 
@@ -29,15 +30,27 @@ namespace Attender.Server.Infrastructure.Sms
                     channel: "sms",
                     pathServiceSid: serviceSid);
 
-                return verification.Status == TwilioConstants.Status.Pending;
+                var status = verification.Status;
+
+                return status == TwilioConstants.Status.Pending
+                    ? Result.Succeeded(status)
+                    : Result.Failure<string>("Verification code was not sent");
             }
-            catch (ApiException)
+            catch (ApiException e)
             {
-                return false;
+                switch (e.Code)
+                {
+                    case 60200:
+                        return Result.Failure<string>("Phone number is invalid");
+                    case 60203:
+                        return Result.Failure<string>("Max attempts reached");
+                    default:
+                        throw;
+                }
             }
         }
 
-        public async Task<bool> CheckVerificationCode(string phoneNumber, string code)
+        public async Task<Result<string>> CheckVerificationCode(string phoneNumber, string code)
         {
             InitTwilioClient();
 
@@ -50,11 +63,23 @@ namespace Attender.Server.Infrastructure.Sms
                     code: code,
                     pathServiceSid: serviceSid);
 
-                return verification.Status == TwilioConstants.Status.Approved;
+                var status = verification.Status;
+
+                return status == TwilioConstants.Status.Approved
+                    ? Result.Succeeded(status)
+                    : Result.Failure<string>("Verification code is incorrect");
             }
-            catch (ApiException)
+            catch (ApiException e)
             {
-                return false;
+                switch (e.Code)
+                {
+                    case 60200:
+                        return Result.Failure<string>("Phone number or verification code has incorrect format");
+                    case 20404:
+                        return Result.Failure<string>("Verification code already approved");
+                    default:
+                        throw;
+                }
             }
         }
 

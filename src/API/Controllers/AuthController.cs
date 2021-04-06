@@ -31,11 +31,11 @@ namespace Attender.Server.API.Controllers
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> SendVerificationPhoneCode([FromBody] SendVerificationPhoneCodeRequest request)
         {
-            var sent = await _smsService.SendVerificationCodeTo(request.PhoneNumber);
+            var result = await _smsService.SendVerificationCodeTo(request.PhoneNumber);
 
-            if (sent) return NoContent();
+            if (result.Succeeded) return NoContent();
 
-            return BadRequest(new ErrorResponse("Phone number is invalid"));
+            return BadRequest(new ErrorResponse(result.Errors));
         }
 
         /// <summary>
@@ -48,10 +48,10 @@ namespace Attender.Server.API.Controllers
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> VerifyPhone([FromBody] VerifyPhoneRequest request)
         {
-            var isValidCode = await _smsService.CheckVerificationCode(request.PhoneNumber, request.Code);
-            if (!isValidCode)
+            var verification = await _smsService.CheckVerificationCode(request.PhoneNumber, request.Code);
+            if (!verification.Succeeded)
             {
-                return BadRequest(new ErrorResponse("Verification code is invalid"));
+                return BadRequest(new ErrorResponse(verification.Errors));
             }
 
             var result = await _authService.LoginOrGenerateAccessToken(request.PhoneNumber);
