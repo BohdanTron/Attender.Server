@@ -56,7 +56,6 @@ namespace Attender.Server.API.Controllers
             }
 
             var result = await _authService.LoginOrGenerateAccessToken(request.PhoneNumber);
-
             return Ok(result);
         }
 

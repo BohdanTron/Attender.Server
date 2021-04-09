@@ -1,3 +1,4 @@
+using Attender.Server.API.Common;
 using Attender.Server.API.Constants;
 using Attender.Server.Application;
 using Attender.Server.Infrastructure;
@@ -6,6 +7,7 @@ using Attender.Server.Infrastructure.Sms;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +17,7 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
@@ -80,6 +83,17 @@ namespace Attender.Server.API
             services.AddControllers(options =>
             {
                 options.Conventions.Add(new RouteTokenTransformerConvention(new DashParameterTransformer()));
+            })
+            .ConfigureApiBehaviorOptions(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    var errors = context.ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage);
+
+                    return new BadRequestObjectResult(new ErrorResponse(errors));
+                };
             });
 
             services.AddSwaggerGen(c =>
