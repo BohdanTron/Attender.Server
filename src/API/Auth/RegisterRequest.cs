@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Attender.Server.API.Auth
 {
@@ -15,5 +16,7 @@ namespace Attender.Server.API.Auth
         [EmailAddress]
         [StringLength(50)]
         public string? Email { get; init; }
+
+        public Guid? AvatarId { get; init; }
     }
 }

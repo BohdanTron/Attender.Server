@@ -41,7 +41,7 @@ namespace Attender.Server.API
                 ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha256Signature },
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
-                ClockSkew = TimeSpan.Zero,
+                ClockSkew = TimeSpan.Zero
             };
 
             services.AddSingleton(tokenParameters);

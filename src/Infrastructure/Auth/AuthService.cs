@@ -3,6 +3,7 @@ using Attender.Server.Application.Common.Models;
 using Attender.Server.Domain.Entities;
 using Attender.Server.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Threading.Tasks;
 
 namespace Attender.Server.Infrastructure.Auth
@@ -23,7 +24,7 @@ namespace Attender.Server.Infrastructure.Auth
             _tokensValidator = tokensValidator;
         }
 
-        public async Task<Result<AuthTokens>> Register(string phoneNumber, string userName, string? email)
+        public async Task<Result<AuthTokens>> Register(string phoneNumber, string userName, string? email, Guid? avatarId = null)
         {
             var exists = await _dbContext.Users.AnyAsync(u =>
                 u.PhoneNumber == phoneNumber || u.UserName == userName || email != null && u.Email == email);
@@ -38,7 +39,8 @@ namespace Attender.Server.Infrastructure.Auth
                 PhoneNumber = phoneNumber,
                 UserName = userName,
                 Email = email,
-                RoleId = (byte) Roles.User
+                RoleId = (byte) Roles.User,
+                AvatarId = avatarId
             };
 
             await _dbContext.Users.AddAsync(user);

@@ -1,5 +1,6 @@
 ﻿using Attender.Server.Application.Common.Mappings;
 using Attender.Server.Domain.Entities;
+using System;
 
 namespace Attender.Server.Application.Users.Queries.GetUser
 {
@@ -9,6 +10,6 @@ namespace Attender.Server.Application.Users.Queries.GetUser
         public string? Email { get; set; }
         public string UserName { get; set; } = default!;
         public string PhoneNumber { get; set; } = default!;
-        public byte RoleId { get; set; }
+        public Guid? AvatarId { get; set; }
     }
 }

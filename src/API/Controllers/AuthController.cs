@@ -70,7 +70,7 @@ namespace Attender.Server.API.Controllers
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Register([FromBody] RegisterRequest request)
         {
-            var result = await _authService.Register(request.PhoneNumber, request.UserName, request.Email);
+            var result = await _authService.Register(request.PhoneNumber, request.UserName, request.Email, request.AvatarId);
 
             if (result.Succeeded) return Ok(result.Data);
 
