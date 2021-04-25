@@ -6,7 +6,6 @@
             => (AccessToken, RefreshToken) = (accessToken, refreshToken);
 
         public Token AccessToken { get; }
-
         public Token? RefreshToken { get; }
     }
 }

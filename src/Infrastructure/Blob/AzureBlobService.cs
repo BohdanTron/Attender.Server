@@ -5,6 +5,8 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
+using BlobInfo = Attender.Server.Application.Common.Models.BlobInfo;
+
 namespace Attender.Server.Infrastructure.Blob
 {
     public class AzureBlobService : IBlobService
@@ -16,7 +18,7 @@ namespace Attender.Server.Infrastructure.Blob
             _blobServiceClient = blobServiceClient;
         }
 
-        public Task<string> UploadAvatar(string contentType, Stream content)
+        public Task<BlobInfo> UploadAvatar(string contentType, Stream content)
         {
             const string containerName = AzureBlobConstants.Container.Avatars;
             var blobName = Guid.NewGuid().ToString();
@@ -24,14 +26,18 @@ namespace Attender.Server.Infrastructure.Blob
             return Upload(containerName, blobName, contentType, content);
         }
 
-        private async Task<string> Upload(string containerName, string blobName, string contentType, Stream content)
+        private async Task<BlobInfo> Upload(string containerName, string blobName, string contentType, Stream content)
         {
             var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
             var blobClient = containerClient.GetBlobClient(blobName);
 
             await blobClient.UploadAsync(content, new BlobHttpHeaders { ContentType = contentType });
 
-            return blobClient.Uri.AbsoluteUri;
+            return new BlobInfo
+            {
+                Name = blobClient.Name,
+                Location = blobClient.Uri.AbsoluteUri
+            };
         }
     }
 }

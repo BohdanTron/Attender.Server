@@ -1,11 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace Attender.Server.API.Common
 {
-    public class UploadRequest
+    public record UploadRequest
     {
         [Required]
-        public IFormFile File { get; set; } = null!;
+        public IFormFile File { get; init; } = null!;
     }
 }

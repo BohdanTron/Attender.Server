@@ -1,10 +1,11 @@
-﻿using System.IO;
+﻿using Attender.Server.Application.Common.Models;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Common.Interfaces
 {
     public interface IBlobService
     {
-        Task<string> UploadAvatar(string contentType, Stream content);
+        Task<BlobInfo> UploadAvatar(string contentType, Stream content);
     }
 }
