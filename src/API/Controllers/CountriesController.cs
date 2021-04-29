@@ -14,10 +14,10 @@ namespace Attender.Server.API.Controllers
         }
 
         [HttpGet("closest")]
-        public async Task<ActionResult<CountryDto>> GetClosestCountry([FromQuery] string code)
+        public async Task<ActionResult<CountryDto>> GetClosestCountries([FromQuery] string code)
         {
-            var countries = await Mediator.Send(new GetClosestCountry(code)); //countries
-            return countries is not null ? Ok(countries) : (ActionResult) NotFound();
+            var countries = await Mediator.Send(new GetClosestCountries(code)); 
+            return Ok(countries);
         }
     }
 }

@@ -4,7 +4,7 @@ using Attender.Server.Domain.Entities;
 
 namespace Attender.Server.Application.Users.Queries.GetCountry
 {
-    public class CountryDto : IMapFrom<Country>
+    public record CountryDto : IMapFrom<Country>
     {
         public int Id { get; set; }
         public string Code { get; set; } = null!;

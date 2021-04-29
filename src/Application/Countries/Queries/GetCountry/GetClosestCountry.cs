@@ -1,4 +1,5 @@
 ﻿using Attender.Server.Application.Common.Interfaces;
+using Attender.Server.Application.Common.Models;
 using Attender.Server.Application.Countries;
 using Attender.Server.Application.Countries.Helpers;
 using AutoMapper;
@@ -14,25 +15,27 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Users.Queries.GetCountry
 {
-    public class GetClosestCountry : IRequest<List<CountryDto>>
+    public class GetClosestCountries : IRequest<List<CountryDto>>
     {
-        public GetClosestCountry(string code) => Code = code;
+        public GetClosestCountries(string code) => Code = code;
 
         public string Code { get; }
     }
 
-    internal class GetClosestCountryHandler : IRequestHandler<GetClosestCountry, List<CountryDto>>
+    internal class GetClosestCountriesHandler : IRequestHandler<GetClosestCountries, List<CountryDto>>
     {
         private readonly IAttenderDbContext _dbContext;
         private readonly IMapper _mapper;
 
-        public GetClosestCountryHandler(IAttenderDbContext dbContext, IMapper mapper)
+        public const int ClosestCountriesCount = 3;
+
+        public GetClosestCountriesHandler(IAttenderDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
             _mapper = mapper;
         }
 
-        public async Task<List<CountryDto>> Handle(GetClosestCountry query, CancellationToken cancellationToken)
+        public async Task<List<CountryDto>> Handle(GetClosestCountries query, CancellationToken cancellationToken)
         {
             var currentCountry = await _dbContext.Countries
                  .ProjectTo<CountryDto>(_mapper.ConfigurationProvider)
@@ -48,40 +51,36 @@ namespace Attender.Server.Application.Users.Queries.GetCountry
                 .Where(c => c.Supported && c.Code != countryDto.Code)
                 .ToListAsync();
 
-            var listOfLength = new List<CountryDto>();
+            var listOfClosestCountries = new List<CountryDto>();
 
             foreach (var country in allCountries)
             {
                 country.Distance = GetDistance((double)countryDto.Latitude, (double)countryDto.Longitude, (double)country.Latitude, (double)country.Longitude);
 
-                listOfLength.Add(country);
+                listOfClosestCountries.Add(country);
             }
 
-            return listOfLength.OrderBy(d => d.Distance).Take(3).ToList();
+            return listOfClosestCountries.OrderBy(d => d.Distance)
+                                         .Take(ClosestCountriesCount)
+                                         .ToList();
         }
 
         /// <summary>
         /// Calculate distance between current location and next location
-        /// </summary>
-        /// <param name="currentLocationLatitude"></param>
-        /// <param name="currentLocationLongitude"></param>
-        /// <param name="nextLocationLatitude"></param>
-        /// <param name="nextLocationLongitude"></param>
-        /// <returns>Distance</returns>
         private static double GetDistance(double currentLocationLatitude, double currentLocationLongitude, double nextLocationLatitude, double nextLocationLongitude, char unit = 'K')
         {
             // In case we will get latitude and longtitude not from DB
             if (!CoordinateValidator.Validate(currentLocationLatitude, currentLocationLongitude))
-                throw new ArgumentException("Invalid origin coordinates supplied.");
+               Result.Failure<string>("Invalid origin coordinates supplied.");
             if (!CoordinateValidator.Validate(nextLocationLatitude, nextLocationLongitude))
-                throw new ArgumentException("Invalid destination coordinates supplied.");
+                Result.Failure<string>("Invalid destination coordinates supplied.");
 
             if (currentLocationLatitude == nextLocationLatitude && currentLocationLongitude == nextLocationLongitude)
             {
                 return 0;
             }
             
-            double theta = currentLocationLongitude - nextLocationLongitude;
+            var theta = currentLocationLongitude - nextLocationLongitude;
 
             // Calculate distance between points of two locations in radians
             double distance = Math.Sin(currentLocationLatitude.ToRadian()) * Math.Sin(nextLocationLatitude.ToRadian())
