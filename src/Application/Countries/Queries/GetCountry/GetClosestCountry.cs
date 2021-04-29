@@ -67,24 +67,24 @@ namespace Attender.Server.Application.Users.Queries.GetCountry
 
         /// <summary>
         /// Calculate distance between current location and next location
-        private static double GetDistance(double currentLocationLatitude, double currentLocationLongitude, double nextLocationLatitude, double nextLocationLongitude, char unit = 'K')
+        private static double GetDistance(double currentLatitude, double currentLongitude, double nextLatitude, double nextLongitude, char unit = 'K')
         {
             // In case we will get latitude and longtitude not from DB
-            if (!CoordinateValidator.Validate(currentLocationLatitude, currentLocationLongitude))
+            if (!CoordinateValidator.Validate(currentLatitude, currentLongitude))
                Result.Failure<string>("Invalid origin coordinates supplied.");
-            if (!CoordinateValidator.Validate(nextLocationLatitude, nextLocationLongitude))
+            if (!CoordinateValidator.Validate(nextLatitude, nextLongitude))
                 Result.Failure<string>("Invalid destination coordinates supplied.");
 
-            if (currentLocationLatitude == nextLocationLatitude && currentLocationLongitude == nextLocationLongitude)
+            if (currentLatitude == nextLatitude && currentLongitude == nextLongitude)
             {
                 return 0;
             }
             
-            var theta = currentLocationLongitude - nextLocationLongitude;
+            var theta = currentLongitude - nextLongitude;
 
             // Calculate distance between points of two locations in radians
-            double distance = Math.Sin(currentLocationLatitude.ToRadian()) * Math.Sin(nextLocationLatitude.ToRadian())
-                            + Math.Cos(currentLocationLatitude).ToRadian() * Math.Cos(nextLocationLatitude.ToRadian())
+            double distance = Math.Sin(currentLatitude.ToRadian()) * Math.Sin(nextLatitude.ToRadian())
+                            + Math.Cos(currentLatitude).ToRadian() * Math.Cos(nextLatitude.ToRadian())
                             * Math.Cos(theta.ToRadian());
 
             distance = Math.Acos(distance);
