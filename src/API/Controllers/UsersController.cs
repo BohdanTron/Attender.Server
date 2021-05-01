@@ -3,6 +3,7 @@ using Attender.Server.Application.Users.Queries.GetUser;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 using System.Threading.Tasks;
 
@@ -15,7 +16,7 @@ namespace Attender.Server.API.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UserDto>> Get([FromQuery] string phoneNumber)
+        public async Task<ActionResult<UserDto>> Get([FromQuery][Required] string phoneNumber)
         {
             var result = await Mediator.Send(new GetUserQuery(phoneNumber));
             return result.Succeeded ? Ok(result.Data) : NotFound(result.Errors);

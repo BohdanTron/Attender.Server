@@ -2,6 +2,7 @@
 using Attender.Server.Application.Countries.Queries.GetCountry;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 using System.Threading.Tasks;
 
@@ -12,14 +13,14 @@ namespace Attender.Server.API.Controllers
     public class CountriesController : ApiControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<CountryDto>> Get([FromQuery] string name)
+        public async Task<ActionResult<CountryDto>> Get([FromQuery][Required] string name)
         {
             var countries = await Mediator.Send(new GetCountriesQuery(name));
             return Ok(countries);
         }
 
         [HttpGet("closest")]
-        public async Task<ActionResult<CountryDto>> GetClosestCountries([FromQuery] string code)
+        public async Task<ActionResult<CountryDto>> GetClosestCountries([FromQuery][Required] string code)
         {
             var countries = await Mediator.Send(new GetClosestCountries(code));
             return Ok(countries);

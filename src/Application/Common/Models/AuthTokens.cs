@@ -1,4 +1,15 @@
-﻿namespace Attender.Server.Application.Common.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Attender.Server.Application.Common.Models
 {
-    public record AuthTokens (Token AccessToken, Token? RefreshToken = null);
+    public record AuthTokens
+    {
+        public AuthTokens(Token accessToken, Token? refreshToken = null)
+            => (AccessToken, RefreshToken) = (accessToken, refreshToken);
+
+        [Required]
+        public Token AccessToken { get; }
+        
+        public Token? RefreshToken { get; }
+    }
 }
