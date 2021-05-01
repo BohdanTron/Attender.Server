@@ -1,8 +1,7 @@
 ﻿using Attender.Server.Application.Common.Mappings;
 using Attender.Server.Domain.Entities;
 
-
-namespace Attender.Server.Application.Users.Queries.GetCountry
+namespace Attender.Server.Application.Countries.Queries.GetCountry
 {
     public record CountryDto : IMapFrom<Country>
     {

@@ -8,27 +8,27 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Attender.Server.Application.Users.Queries.GetCountry
+namespace Attender.Server.Application.Countries.Queries.GetCountry
 {
-    public class GetCountryQuery : IRequest<List<CountryDto>>
+    public class GetCountriesQuery : IRequest<List<CountryDto>>
     {
-        public GetCountryQuery(string name) => Name = name;
+        public GetCountriesQuery(string name) => Name = name;
 
         public string Name { get; }
     }
 
-    internal class GetCountryQueryHandler : IRequestHandler<GetCountryQuery, List<CountryDto>>
+    internal class GetCountiesQueryHandler : IRequestHandler<GetCountriesQuery, List<CountryDto>>
     {
         private readonly IAttenderDbContext _dbContext;
         private readonly IMapper _mapper;
 
-        public GetCountryQueryHandler(IAttenderDbContext dbContext, IMapper mapper)
+        public GetCountiesQueryHandler(IAttenderDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
             _mapper = mapper;
         }
 
-        public Task<List<CountryDto>> Handle(GetCountryQuery query, CancellationToken cancellationToken)
+        public Task<List<CountryDto>> Handle(GetCountriesQuery query, CancellationToken cancellationToken)
         {
             return _dbContext.Countries
                 .AsNoTracking()
@@ -36,6 +36,5 @@ namespace Attender.Server.Application.Users.Queries.GetCountry
                 .Where(c => c.Name.Contains(query.Name) && c.Supported)
                 .ToListAsync(cancellationToken);
         }
-
     }
 }

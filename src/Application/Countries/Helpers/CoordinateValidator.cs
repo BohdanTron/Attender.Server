@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Attender.Server.Application.Countries.Helpers
+﻿namespace Attender.Server.Application.Countries.Helpers
 {
     public static class CoordinateValidator
     {

@@ -1,6 +1,5 @@
 ﻿using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
-using Attender.Server.Application.Countries;
 using Attender.Server.Application.Countries.Helpers;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -9,11 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Attender.Server.Application.Users.Queries.GetCountry
+namespace Attender.Server.Application.Countries.Queries.GetCountry
 {
     public class GetClosestCountries : IRequest<List<CountryDto>>
     {
@@ -40,7 +38,7 @@ namespace Attender.Server.Application.Users.Queries.GetCountry
             var currentCountry = await _dbContext.Countries
                  .ProjectTo<CountryDto>(_mapper.ConfigurationProvider)
                  .FirstOrDefaultAsync(c => c.Code == query.Code, cancellationToken);
-            
+
             return await GetClosestCountries(currentCountry);
         }
 
@@ -51,58 +49,69 @@ namespace Attender.Server.Application.Users.Queries.GetCountry
                 .Where(c => c.Supported && c.Code != countryDto.Code)
                 .ToListAsync();
 
-            var listOfClosestCountries = new List<CountryDto>();
+            var closestCountries = new List<CountryDto>();
 
             foreach (var country in allCountries)
             {
-                country.Distance = GetDistance((double)countryDto.Latitude, (double)countryDto.Longitude, (double)country.Latitude, (double)country.Longitude);
+                country.Distance = GetDistance(
+                                     (double) countryDto.Latitude,
+                                     (double) countryDto.Longitude,
+                                     (double) country.Latitude,
+                                     (double) country.Longitude);
 
-                listOfClosestCountries.Add(country);
+                closestCountries.Add(country);
             }
 
-            return listOfClosestCountries.OrderBy(d => d.Distance)
+            return closestCountries.OrderBy(c => c.Distance)
                                          .Take(ClosestCountriesCount)
                                          .ToList();
         }
 
-        /// <summary>
-        /// Calculate distance between current location and next location
-        private static double GetDistance(double currentLatitude, double currentLongitude, double nextLatitude, double nextLongitude, char unit = 'K')
+        private static double GetDistance(
+            double currentLatitude,
+            double currentLongitude,
+            double nextLatitude,
+            double nextLongitude,
+            char unit = 'K')
         {
-            // In case we will get latitude and longtitude not from DB
+            // In case we will get latitude and longitude not from DB
             if (!CoordinateValidator.Validate(currentLatitude, currentLongitude))
-               Result.Failure<string>("Invalid origin coordinates supplied.");
+                Result.Failure<string>("Invalid origin coordinates supplied.");
             if (!CoordinateValidator.Validate(nextLatitude, nextLongitude))
                 Result.Failure<string>("Invalid destination coordinates supplied.");
 
-            if (currentLatitude == nextLatitude && currentLongitude == nextLongitude)
+            const double tolerance = 0.000000001;
+            if (Math.Abs(currentLatitude - nextLatitude) < tolerance && Math.Abs(currentLongitude - nextLongitude) < tolerance)
             {
                 return 0;
             }
-            
+
             var theta = currentLongitude - nextLongitude;
 
             // Calculate distance between points of two locations in radians
-            double distance = Math.Sin(currentLatitude.ToRadian()) * Math.Sin(nextLatitude.ToRadian())
+            var distance = Math.Sin(currentLatitude.ToRadian()) * Math.Sin(nextLatitude.ToRadian())
                             + Math.Cos(currentLatitude).ToRadian() * Math.Cos(nextLatitude.ToRadian())
                             * Math.Cos(theta.ToRadian());
 
             distance = Math.Acos(distance);
+
             // Convert to degrees
             distance = distance.ToDegrees();
+
             // 1.1515 is the number of statute miles in a nautical mile
             distance = distance * 60 * 1.1515;
 
-            // 60 * 1.1515 * 1.609344 kilometres to one degree
-            if (unit == 'K')
+            switch (unit)
             {
-                distance *= 1.609344;
+                // 60 * 1.1515 * 1.609344 kilometers to one degree
+                case 'K':
+                    distance *= 1.609344;
+                    break;
+                case 'N':
+                    distance *= 0.8684;
+                    break;
             }
-            else if (unit == 'N')
-            {
-                distance *= 0.8684;
-            }
-            
+
             return distance;
         }
     }
