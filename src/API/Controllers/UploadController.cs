@@ -1,13 +1,15 @@
 ﻿using Attender.Server.API.Common;
+using Attender.Server.API.Constants;
 using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace Attender.Server.API.Controllers
 {
-    //[Authorize(Policy = AuthConstants.Policy.RegisteredOnly)]
+    [Authorize(Policy = AuthConstants.Policy.RegisteredOnly)]
     public class UploadController : ApiControllerBase
     {
         private readonly IBlobService _blobService;
