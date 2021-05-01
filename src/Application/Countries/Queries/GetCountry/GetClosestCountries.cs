@@ -53,11 +53,13 @@ namespace Attender.Server.Application.Countries.Queries.GetCountry
 
             foreach (var country in allCountries)
             {
-                country.Distance = GetDistance(
+                var result = GetDistance(
                                      (double) countryDto.Latitude,
                                      (double) countryDto.Longitude,
                                      (double) country.Latitude,
                                      (double) country.Longitude);
+
+                if (!result.Succeeded) return Enumerable.Empty<CountryDto>().ToList();
 
                 closestCountries.Add(country);
             }
@@ -67,23 +69,22 @@ namespace Attender.Server.Application.Countries.Queries.GetCountry
                                          .ToList();
         }
 
-        private static double GetDistance(
+        private static Result<double> GetDistance(
             double currentLatitude,
             double currentLongitude,
             double nextLatitude,
             double nextLongitude,
             char unit = 'K')
         {
-            // In case we will get latitude and longitude not from DB
             if (!CoordinateValidator.Validate(currentLatitude, currentLongitude))
-                Result.Failure<string>("Invalid origin coordinates supplied.");
+                return Result.Failure<double>("Invalid origin coordinates supplied.");
             if (!CoordinateValidator.Validate(nextLatitude, nextLongitude))
-                Result.Failure<string>("Invalid destination coordinates supplied.");
+                return Result.Failure<double>("Invalid destination coordinates supplied.");
 
             const double tolerance = 0.000000001;
             if (Math.Abs(currentLatitude - nextLatitude) < tolerance && Math.Abs(currentLongitude - nextLongitude) < tolerance)
             {
-                return 0;
+                return Result.Success(0.0);
             }
 
             var theta = currentLongitude - nextLongitude;
@@ -112,7 +113,7 @@ namespace Attender.Server.Application.Countries.Queries.GetCountry
                     break;
             }
 
-            return distance;
+            return Result.Success(distance);
         }
     }
 }
