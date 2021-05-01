@@ -17,8 +17,8 @@ namespace Attender.Server.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<UserDto>> Get([FromQuery] string phoneNumber)
         {
-            var user = await Mediator.Send(new GetUserQuery(phoneNumber));
-            return user is not null ? Ok(user) : (ActionResult) NotFound();
+            var result = await Mediator.Send(new GetUserQuery(phoneNumber));
+            return result.Succeeded ? Ok(result.Data) : NotFound(result.Errors);
         }
     }
 }

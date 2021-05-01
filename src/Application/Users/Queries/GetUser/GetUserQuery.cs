@@ -1,4 +1,5 @@
 ﻿using Attender.Server.Application.Common.Interfaces;
+using Attender.Server.Application.Common.Models;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
@@ -8,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Users.Queries.GetUser
 {
-    public class GetUserQuery : IRequest<UserDto?>
+    public class GetUserQuery : IRequest<Result<UserDto>>
     {
         public GetUserQuery(string phoneNumber) => PhoneNumber = phoneNumber;
 
         public string PhoneNumber { get; }
     }
 
-    internal class GetUserQueryHandler : IRequestHandler<GetUserQuery, UserDto?>
+    internal class GetUserQueryHandler : IRequestHandler<GetUserQuery, Result<UserDto>>
     {
         private readonly IAttenderDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -26,11 +27,15 @@ namespace Attender.Server.Application.Users.Queries.GetUser
             _mapper = mapper;
         }
 
-        public Task<UserDto?> Handle(GetUserQuery query, CancellationToken cancellationToken)
+        public async Task<Result<UserDto>> Handle(GetUserQuery query, CancellationToken cancellationToken)
         {
-            return _dbContext.Users
+            var user = await _dbContext.Users
                 .ProjectTo<UserDto?>(_mapper.ConfigurationProvider)
                 .SingleOrDefaultAsync(u => u!.PhoneNumber == query.PhoneNumber, cancellationToken);
+
+            return user is null
+                ? Result.Failure<UserDto>("User doesn't exist")
+                : Result.Success(user);
         }
     }
 }
