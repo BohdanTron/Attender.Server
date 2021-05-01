@@ -4,6 +4,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,9 +12,8 @@ namespace Attender.Server.Application.Users.Queries.GetUser
 {
     public class GetUserQuery : IRequest<Result<UserDto>>
     {
-        public GetUserQuery(string phoneNumber) => PhoneNumber = phoneNumber;
-
-        public string PhoneNumber { get; }
+        [Required]
+        public string PhoneNumber { get; set; } = null!;
     }
 
     internal class GetUserQueryHandler : IRequestHandler<GetUserQuery, Result<UserDto>>

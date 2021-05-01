@@ -1,20 +1,21 @@
 ﻿using Attender.Server.Application.Common.Interfaces;
+using Attender.Server.Application.Countries.Models;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Attender.Server.Application.Countries.Queries.GetCountry
+namespace Attender.Server.Application.Countries.Queries.GetCountries
 {
     public class GetCountriesQuery : IRequest<List<CountryDto>>
     {
-        public GetCountriesQuery(string name) => Name = name;
-
-        public string Name { get; }
+        [Required]
+        public string Name { get; set; } = null!;
     }
 
     internal class GetCountiesQueryHandler : IRequestHandler<GetCountriesQuery, List<CountryDto>>

@@ -1,8 +1,10 @@
 ﻿using Attender.Server.API.Constants;
-using Attender.Server.Application.Countries.Queries.GetCountry;
+using Attender.Server.Application.Countries.Models;
+using Attender.Server.Application.Countries.Queries.GetClosestCountries;
+using Attender.Server.Application.Countries.Queries.GetCountries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
 
@@ -13,17 +15,15 @@ namespace Attender.Server.API.Controllers
     public class CountriesController : ApiControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<CountryDto>> Get([FromQuery][Required] string name)
+        public async Task<ActionResult<List<CountryDto>>> Get([FromQuery] GetCountriesQuery request)
         {
-            var countries = await Mediator.Send(new GetCountriesQuery(name));
-            return Ok(countries);
+            return await Mediator.Send(request);
         }
 
         [HttpGet("closest")]
-        public async Task<ActionResult<CountryDto>> GetClosestCountries([FromQuery][Required] string code)
+        public async Task<ActionResult<List<CountryDto>>> GetClosestCountries([FromQuery] GetClosestCountriesQuery request)
         {
-            var countries = await Mediator.Send(new GetClosestCountries(code));
-            return Ok(countries);
+            return await Mediator.Send(request);
         }
     }
 }

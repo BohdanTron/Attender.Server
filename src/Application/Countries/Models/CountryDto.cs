@@ -2,7 +2,7 @@
 using Attender.Server.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 
-namespace Attender.Server.Application.Countries.Queries.GetCountry
+namespace Attender.Server.Application.Countries.Models
 {
     public record CountryDto : IMapFrom<Country>
     {

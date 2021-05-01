@@ -1,26 +1,27 @@
 ﻿using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
 using Attender.Server.Application.Countries.Helpers;
+using Attender.Server.Application.Countries.Models;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Attender.Server.Application.Countries.Queries.GetCountry
+namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
 {
-    public class GetClosestCountries : IRequest<List<CountryDto>>
+    public class GetClosestCountriesQuery : IRequest<List<CountryDto>>
     {
-        public GetClosestCountries(string code) => Code = code;
-
-        public string Code { get; }
+        [Required]
+        public string Code { get; set; } = null!;
     }
 
-    internal class GetClosestCountriesHandler : IRequestHandler<GetClosestCountries, List<CountryDto>>
+    internal class GetClosestCountriesHandler : IRequestHandler<GetClosestCountriesQuery, List<CountryDto>>
     {
         private readonly IAttenderDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -33,7 +34,7 @@ namespace Attender.Server.Application.Countries.Queries.GetCountry
             _mapper = mapper;
         }
 
-        public async Task<List<CountryDto>> Handle(GetClosestCountries query, CancellationToken cancellationToken)
+        public async Task<List<CountryDto>> Handle(GetClosestCountriesQuery query, CancellationToken cancellationToken)
         {
             var currentCountry = await _dbContext.Countries
                  .ProjectTo<CountryDto>(_mapper.ConfigurationProvider)
