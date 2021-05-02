@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.API.Controllers
 {
-    [Authorize(Policy = AuthConstants.Policy.RegisteredOnly)]
+    [Authorize]
     [Produces(MediaTypeNames.Application.Json)]
     public class UploadController : ApiControllerBase
     {
