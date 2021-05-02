@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Attender.Server.API.Auth
+namespace Attender.Server.API.Requests.Auth
 {
     public record VerifyPhoneRequest
     {

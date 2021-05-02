@@ -1,5 +1,5 @@
-﻿using Attender.Server.API.Auth;
-using Attender.Server.API.Common;
+﻿using Attender.Server.API.Common;
+using Attender.Server.API.Requests.Auth;
 using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
 using Microsoft.AspNetCore.Authorization;
