@@ -1,4 +1,5 @@
-﻿using Attender.Server.Application.Common.Interfaces;
+﻿using Attender.Server.Application.Cities.Queries;
+using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Countries.Models;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -29,13 +30,40 @@ namespace Attender.Server.Application.Countries.Queries.GetCountries
             _mapper = mapper;
         }
 
-        public Task<List<CountryDto>> Handle(GetCountriesQuery query, CancellationToken cancellationToken)
+        public async Task<List<CountryDto>> Handle(GetCountriesQuery query, CancellationToken cancellationToken)
         {
-            return _dbContext.Countries
+            var countries = _dbContext.Countries
                 .AsNoTracking()
                 .ProjectTo<CountryDto>(_mapper.ConfigurationProvider)
                 .Where(c => c.Name.Contains(query.Name) && c.Supported)
                 .ToListAsync(cancellationToken);
+
+            foreach(var country in await countries)
+            {
+                country.Cities = await GetPopularCities(country.Id);
+            }
+
+            return await countries;
+        }
+
+        private async Task<List<CityDto>> GetPopularCities(int countryId)
+        {
+            var popularCitiesPerCountry = _dbContext.Events
+               .Join(_dbContext.Locations, e => e.LocationId, l => l.Id, (e, l) => new { e, l })
+               .Join(_dbContext.Cities, cl => cl.l.CityId, c => c.Id, (cl, c) => new { cl, c })
+               .Where(a => a.c.CountryId == countryId)
+               //.OrderByDescending(z => z.cl.e.Id.ToString().Count())
+               .GroupBy(x => new { x.c.Name, x.c.Id, x.c.CountryId })
+               .Select(m => new CityDto
+               {
+                   Name = m.Key.Name,
+                   Id = m.Key.Id,
+                   CountryId = m.Key.CountryId
+               })
+               .AsNoTracking()
+               .ToListAsync();
+
+            return await popularCitiesPerCountry;
         }
     }
 }

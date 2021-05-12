@@ -1,4 +1,5 @@
-﻿using Attender.Server.Application.Common.Interfaces;
+﻿using Attender.Server.Application.Cities.Queries;
+using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
 using Attender.Server.Application.Countries.Helpers;
 using Attender.Server.Application.Countries.Models;
@@ -37,8 +38,8 @@ namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
         public async Task<List<CountryDto>> Handle(GetClosestCountriesQuery query, CancellationToken cancellationToken)
         {
             var currentCountry = await _dbContext.Countries
-                 .ProjectTo<CountryDto>(_mapper.ConfigurationProvider)
-                 .FirstOrDefaultAsync(c => c.Code == query.Code, cancellationToken);
+                .ProjectTo<CountryDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(c => c.Code == query.Code, cancellationToken);
 
             return await GetClosestCountries(currentCountry);
         }
@@ -55,10 +56,14 @@ namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
             foreach (var country in allCountries)
             {
                 var result = GetDistance(
-                                     (double) countryDto.Latitude,
-                                     (double) countryDto.Longitude,
-                                     (double) country.Latitude,
-                                     (double) country.Longitude);
+                                     (double)countryDto.Latitude,
+                                     (double)countryDto.Longitude,
+                                     (double)country.Latitude,
+                                     (double)country.Longitude);
+
+                country.Distance = result.Data;
+
+                country.Cities = await GetPopularCities(country.Id);
 
                 if (!result.Succeeded) return Enumerable.Empty<CountryDto>().ToList();
 
@@ -66,8 +71,8 @@ namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
             }
 
             return closestCountries.OrderBy(c => c.Distance)
-                                         .Take(ClosestCountriesCount)
-                                         .ToList();
+                                    .Take(ClosestCountriesCount)
+                                    .ToList();
         }
 
         private static Result<double> GetDistance(
@@ -115,6 +120,26 @@ namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
             }
 
             return Result.Success(distance);
+        }
+
+        private async Task<List<CityDto>> GetPopularCities(int countryId)
+        {
+            var popularCitiesPerCountry = _dbContext.Events
+               .Join(_dbContext.Locations, e => e.LocationId, l => l.Id, (e, l) => new { e, l })
+               .Join(_dbContext.Cities, cl => cl.l.CityId, c => c.Id, (cl, c) => new { cl, c })
+               .Where(a => a.c.CountryId == countryId)
+               //.OrderByDescending(z => z.cl.e.Id.ToString().Count())
+               .GroupBy(x => new { x.c.Name, x.c.Id, x.c.CountryId })
+               .Select(m => new CityDto
+               {
+                   Name = m.Key.Name,
+                   Id = m.Key.Id,
+                   CountryId = m.Key.CountryId
+               })
+               .AsNoTracking()
+               .ToListAsync();
+
+            return await popularCitiesPerCountry;
         }
     }
 }

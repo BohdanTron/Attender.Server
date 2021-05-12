@@ -14,6 +14,7 @@ namespace Attender.Server.Application.Cities.Queries
 
         public string Name { get; set; } = null!;
         
-        public string CountryId { get; set; } = null!;
+        public int CountryId { get; set; }
+
     }
 }

@@ -1,19 +1,21 @@
 ﻿using Attender.Server.Application.Cities.Queries;
+using Attender.Server.Application.Cities.Queries.GetPopularCities;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 
 namespace Attender.Server.API.Controllers
 {
+    [Produces(MediaTypeNames.Application.Json)]
     public class CitiesController  : ApiControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<CityDto>> Get([FromQuery] string name)
+        public async Task<ActionResult<List<CityDto>>> Get([FromQuery] GetCitiesQuery request)
         {
-            var countries = await Mediator.Send(new GetCitiesQuery(name));
-            return countries is not null ? Ok(countries) : (ActionResult)NotFound();
+            return await Mediator.Send(request);
         }
     }
 }
