@@ -10,10 +10,10 @@ namespace Attender.Server.Application.SubCategories.Queries
 {
     public record SubCategoryDto : IMapFrom<SubCategory>
     {
-        public int Id { get; set; }
+        public int Id { get; init; }
 
-        public string Name { get; set; } = default!;
+        public string Name { get; init; } = null!;
 
-        public int CategoryId { get; set; }
+        public int CategoryId { get; init; }
     }
 }
