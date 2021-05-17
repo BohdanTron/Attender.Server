@@ -1,20 +1,14 @@
 ﻿using Attender.Server.Application.Common.Mappings;
 using Attender.Server.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Cities.Queries
 {
     public record CityDto : IMapFrom<City>
     {
-        public int Id { get; set; }
+        public int Id { get; init; }
 
-        public string Name { get; set; } = null!;
+        public string Name { get; init; } = null!;
         
-        public int CountryId { get; set; }
-
+        public int CountryId { get; init; }
     }
 }

@@ -14,12 +14,18 @@ namespace Attender.Server.API.Controllers
     [Produces(MediaTypeNames.Application.Json)]
     public class CountriesController : ApiControllerBase
     {
+        /// <summary>
+        /// Gets list of countries
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<List<CountryDto>>> Get([FromQuery] GetCountriesQuery request)
         {
             return await Mediator.Send(request);
         }
 
+        /// <summary>
+        /// Gets closest countries and their cities
+        /// </summary>
         [HttpGet("closest")]
         public async Task<ActionResult<List<CountryDto>>> GetClosestCountries([FromQuery] GetClosestCountriesQuery request)
         {
