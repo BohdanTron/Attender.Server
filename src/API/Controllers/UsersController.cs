@@ -1,4 +1,5 @@
 ﻿using Attender.Server.API.Constants;
+using Attender.Server.Application.Common.Models;
 using Attender.Server.Application.Users.Queries.GetUser;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,11 +15,11 @@ namespace Attender.Server.API.Controllers
     {
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<UserDto>> Get([FromQuery] GetUserQuery request)
         {
             var result = await Mediator.Send(request);
-            return result.Succeeded ? Ok(result.Data) : NotFound(result.Errors);
+            return result.Succeeded ? Ok(result.Data) : NotFound(result.Error);
         }
     }
 }

@@ -77,10 +77,11 @@ namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
             double nextLongitude,
             char unit = 'K')
         {
+            // TODO: Move errors to constants
             if (!CoordinateValidator.Validate(currentLatitude, currentLongitude))
-                return Result.Failure<double>("Invalid origin coordinates supplied.");
+                return Result.Failure<double>("invalid_coordinates", "Invalid origin coordinates supplied");
             if (!CoordinateValidator.Validate(nextLatitude, nextLongitude))
-                return Result.Failure<double>("Invalid destination coordinates supplied.");
+                return Result.Failure<double>("invalid_coordinates", "Invalid destination coordinates supplied.");
 
             const double tolerance = 0.000000001;
             if (Math.Abs(currentLatitude - nextLatitude) < tolerance && Math.Abs(currentLongitude - nextLongitude) < tolerance)
