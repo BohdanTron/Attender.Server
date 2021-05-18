@@ -1,6 +1,6 @@
 ﻿namespace Attender.Server.Domain.Enums
 {
-    public enum Roles : byte
+    public enum Role : byte
     {
         Admin = 1,
         User = 2

@@ -4,7 +4,6 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,7 +11,6 @@ namespace Attender.Server.Application.Users.Queries.GetUser
 {
     public class GetUserQuery : IRequest<Result<UserDto>>
     {
-        [Required]
         public string PhoneNumber { get; set; } = null!;
     }
 
@@ -34,7 +32,7 @@ namespace Attender.Server.Application.Users.Queries.GetUser
                 .SingleOrDefaultAsync(u => u!.PhoneNumber == query.PhoneNumber, cancellationToken);
 
             return user is null
-                ? Result.Failure<UserDto>("User doesn't exist")
+                ? Result.Failure<UserDto>("user_not_found", "User doesn't exist")
                 : Result.Success(user);
         }
     }

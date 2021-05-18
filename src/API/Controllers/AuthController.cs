@@ -1,5 +1,5 @@
-﻿using Attender.Server.API.Common;
-using Attender.Server.API.Requests.Auth;
+﻿using Attender.Server.Application.Common.DTOs.Auth;
+using Attender.Server.Application.Common.DTOs.Sms;
 using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -29,14 +29,14 @@ namespace Attender.Server.API.Controllers
         /// <response code="400">Phone number is invalid</response>
         [HttpPost("send-verification-phone-code")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> SendVerificationPhoneCode([FromBody] SendVerificationPhoneCodeRequest request)
+        [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> SendVerificationPhoneCode([FromBody] PhoneSendingDto dto)
         {
-            var result = await _smsService.SendVerificationCodeTo(request.PhoneNumber);
+            var result = await _smsService.SendVerificationCode(dto);
 
             if (result.Succeeded) return NoContent();
 
-            return BadRequest(new ErrorResponse(result.Errors));
+            return BadRequest(result.Error);
         }
 
         /// <summary>
@@ -46,16 +46,14 @@ namespace Attender.Server.API.Controllers
         /// <response code="400">Verification code is invalid</response>
         [HttpPost("verify-phone")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<AuthTokens>> VerifyPhone([FromBody] VerifyPhoneRequest request)
+        [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<AuthTokens>> VerifyPhone([FromBody] PhoneVerificationDto dto)
         {
-            var verification = await _smsService.CheckVerificationCode(request.PhoneNumber, request.Code);
-            if (!verification.Succeeded)
-            {
-                return BadRequest(new ErrorResponse(verification.Errors));
-            }
+            var verification = await _smsService.CheckVerificationCode(dto);
 
-            var result = await _authService.LoginOrGenerateAccessToken(request.PhoneNumber);
+            if (!verification.Succeeded) return BadRequest(verification.Error);
+
+            var result = await _authService.LoginOrGenerateAccessToken(dto.PhoneNumber);
             return Ok(result);
         }
 
@@ -67,14 +65,14 @@ namespace Attender.Server.API.Controllers
         [HttpPost("register")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<AuthTokens>> Register([FromBody] RegisterRequest request)
+        [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<AuthTokens>> Register([FromBody] UserRegistrationInfoDto dto)
         {
-            var result = await _authService.Register(request.PhoneNumber, request.UserName, request.Email, request.AvatarId);
+            var result = await _authService.Register(dto);
 
             if (result.Succeeded) return Ok(result.Data);
 
-            return BadRequest(new ErrorResponse(result.Errors));
+            return BadRequest(result.Error);
         }
 
         /// <summary>
@@ -84,14 +82,14 @@ namespace Attender.Server.API.Controllers
         /// <response code="400">Tokens are invalid</response>
         [HttpPost("refresh-token")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<AuthTokens>> RefreshToken([FromBody] RefreshTokenRequest request)
+        [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<AuthTokens>> RefreshToken([FromBody] RefreshTokenDto dto)
         {
-            var result = await _authService.RefreshToken(request.AccessToken, request.RefreshToken);
+            var result = await _authService.RefreshToken(dto);
 
             if (result.Succeeded) return Ok(result.Data);
 
-            return BadRequest(new ErrorResponse(result.Errors));
+            return BadRequest(result.Error);
         }
     }
 }

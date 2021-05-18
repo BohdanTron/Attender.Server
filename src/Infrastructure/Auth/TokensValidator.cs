@@ -1,4 +1,5 @@
-﻿using Attender.Server.Application.Common.Interfaces;
+﻿using Attender.Server.Application.Common.Helpers;
+using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
 using Attender.Server.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -26,48 +27,49 @@ namespace Attender.Server.Infrastructure.Auth
 
         public async Task<Result<RefreshToken>> ValidateRefreshToken(string accessToken, string refreshToken)
         {
-            var principal = GetPrincipalFromToken(accessToken, out var errorMessage);
-            if (principal is null)
+            var result = GetPrincipalFromToken(accessToken);
+            if (!result.Succeeded)
             {
-                return Result.Failure<RefreshToken>(errorMessage);
+                return Result.Failure<RefreshToken>(result.Error!);
             }
 
-            var expiration = long.Parse(principal.Claims.Single(c => c.Type == JwtRegisteredClaimNames.Exp).Value);
+            var principal = result.Data;
+
+            var expiration = long.Parse(principal!.Claims.Single(c => c.Type == JwtRegisteredClaimNames.Exp).Value);
 
             var expirationDate = DateTime.UnixEpoch.AddSeconds(expiration);
             if (expirationDate > DateTime.UtcNow)
             {
-                return Result.Failure<RefreshToken>("Token hasn't expired yet");
+                return Result.Failure<RefreshToken>(Errors.Auth.AccessTokenNotExpired());
             }
 
             var storedToken = await _context.RefreshTokens.FirstOrDefaultAsync(r => r.Value == refreshToken);
             if (storedToken is null)
             {
-                return Result.Failure<RefreshToken>("Refresh token doesn't exist");
+                return Result.Failure<RefreshToken>(Errors.Auth.RefreshTokenNotExist());
             }
 
             if (DateTime.UtcNow > storedToken.ExpiryDate)
             {
-                return Result.Failure<RefreshToken>("Refresh token has expired");
+                return Result.Failure<RefreshToken>(Errors.Auth.RefreshTokenExpired());
             }
 
             if (storedToken.Used)
             {
-                return Result.Failure<RefreshToken>("Refresh token has been used");
+                return Result.Failure<RefreshToken>(Errors.Auth.RefreshTokenUsed());
             }
 
             var jti = principal.Claims.Single(c => c.Type == JwtRegisteredClaimNames.Jti);
             if (jti.Value != storedToken.AccessTokenId)
             {
-                return Result.Failure<RefreshToken>("Refresh token doesn't match JWT");
+                return Result.Failure<RefreshToken>(Errors.Auth.RefreshTokenNotMatchJwt());
             }
 
             return Result.Success(storedToken);
         }
 
-        private ClaimsPrincipal? GetPrincipalFromToken(string token, out string errorMessage)
+        private Result<ClaimsPrincipal> GetPrincipalFromToken(string token)
         {
-            errorMessage = string.Empty;
             var tokenHandler = new JwtSecurityTokenHandler();
 
             try
@@ -76,12 +78,13 @@ namespace Attender.Server.Infrastructure.Auth
                 parameters.ValidateLifetime = false;
 
                 var principal = tokenHandler.ValidateToken(token, parameters, out var validatedToken);
-                return ValidateTokenAlgorithm(validatedToken) ? principal : null;
+                return ValidateTokenAlgorithm(validatedToken)
+                    ? Result.Success(principal)
+                    : Result.Failure<ClaimsPrincipal>(Errors.Auth.AccessTokenInvalidAlgorithm());
             }
-            catch (SecurityTokenException exception)
+            catch (SecurityTokenException e)
             {
-                errorMessage = exception.Message;
-                return null;
+                return Result.Failure<ClaimsPrincipal>(Errors.Auth.AccessTokenSecurityIssue(e.Message));
             }
         }
 

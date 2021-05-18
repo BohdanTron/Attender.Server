@@ -1,38 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Attender.Server.Application.Common.Models
+﻿namespace Attender.Server.Application.Common.Models
 {
     public static class Result
     {
         public static Result<T> Success<T>(T data)
         {
-            return new(true, data, Array.Empty<string>());
+            return new(true, data, default);
         }
 
-        public static Result<T> Failure<T>(string error)
+        public static Result<T> Failure<T>(string errorType, string errorMessage)
         {
-            return Failure<T>(new[] { error });
+            return Failure<T>(new Error(errorType, errorMessage));
         }
 
-        public static Result<T> Failure<T>(IEnumerable<string> errors)
+        public static Result<T> Failure<T>(Error error)
         {
-            return new(false, default, errors);
+            return new(false, default, error);
         }
     }
 
     public class Result<T>
     {
-        internal Result(bool succeeded, T? data, IEnumerable<string> errors)
+        internal Result(bool succeeded, T? data, Error? error)
         {
             Succeeded = succeeded;
             Data = data;
-            Errors = errors.ToArray();
+            Error = error;
         }
 
         public bool Succeeded { get; }
         public T? Data { get; }
-        public string[] Errors { get; }
+        public Error? Error { get; }
     }
 }
