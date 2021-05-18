@@ -1,10 +1,11 @@
-﻿using Attender.Server.Application.Common.Interfaces;
+﻿using Attender.Server.Application.Common.DTOs.Auth;
+using Attender.Server.Application.Common.Helpers;
+using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
 using Attender.Server.Domain.Entities;
-using Attender.Server.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Threading.Tasks;
+using Role = Attender.Server.Domain.Enums.Role;
 
 namespace Attender.Server.Infrastructure.Auth
 {
@@ -24,23 +25,24 @@ namespace Attender.Server.Infrastructure.Auth
             _tokensValidator = tokensValidator;
         }
 
-        public async Task<Result<AuthTokens>> Register(string phoneNumber, string userName, string? email, Guid? avatarId = null)
+        public async Task<Result<AuthTokens>> Register(UserRegistrationInfoDto dto)
         {
-            var exists = await _dbContext.Users.AnyAsync(u =>
-                u.PhoneNumber == phoneNumber || u.UserName == userName || email != null && u.Email == email);
+            var exists = await _dbContext.Users
+                .AnyAsync(u => u.PhoneNumber == dto.PhoneNumber || u.UserName == dto.UserName ||
+                               dto.Email != null && u.Email == dto.Email);
 
             if (exists)
             {
-                return Result.Failure<AuthTokens>("User with such settings already exists");
+                return Result.Failure<AuthTokens>(Errors.User.Exists());
             }
 
             var user = new User
             {
-                PhoneNumber = phoneNumber,
-                UserName = userName,
-                Email = email,
-                RoleId = (byte) Roles.User,
-                AvatarId = avatarId
+                PhoneNumber = dto.PhoneNumber,
+                UserName = dto.UserName,
+                Email = dto.Email,
+                RoleId = (byte) Role.User,
+                AvatarId = dto.AvatarId
             };
 
             await _dbContext.Users.AddAsync(user);
@@ -64,12 +66,14 @@ namespace Attender.Server.Infrastructure.Auth
             return new AuthTokens(accessToken);
         }
 
-        public async Task<Result<AuthTokens>> RefreshToken(string accessToken, string refreshToken)
+        public async Task<Result<AuthTokens>> RefreshToken(RefreshTokenDto dto)
         {
+            var (accessToken, refreshToken) = (dto.AccessToken, dto.RefreshToken);
+
             var validation = await _tokensValidator.ValidateRefreshToken(accessToken, refreshToken);
             if (!validation.Succeeded)
             {
-                return Result.Failure<AuthTokens>(validation.Errors);
+                return Result.Failure<AuthTokens>(validation.Error!);
             }
 
             var storedToken = validation.Data;

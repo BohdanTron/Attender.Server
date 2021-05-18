@@ -1,10 +1,9 @@
-﻿using Attender.Server.API.Constants;
-using Attender.Server.API.Requests.Upload;
-using Attender.Server.Application.Common.Interfaces;
+﻿using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 using System.Threading.Tasks;
 
@@ -27,11 +26,9 @@ namespace Attender.Server.API.Controllers
         /// <response code="200">Avatar successfully uploaded</response>
         [HttpPost("avatar")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<BlobInfo>> Avatar([FromForm] UploadRequest request)
+        public async Task<ActionResult<BlobInfo>> Avatar([Required] IFormFile file)
         {
-            var file = request.File;
             var result = await _blobService.UploadAvatar(file.ContentType, file.OpenReadStream());
-
             return Ok(result);
         }
     }
