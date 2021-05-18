@@ -17,7 +17,7 @@ namespace Attender.Server.Application.Categories.Queries
     public class GetCategoriesWithSubCategoriesQuery : IRequest<List<CategoryDto>>
     {
         [Required]
-        public int Id { get; set; }
+        public List<int> Ids { get; set; }
     }
 
     internal class GetCategoriesQueryHandler : IRequestHandler<GetCategoriesWithSubCategoriesQuery, List<CategoryDto>>
@@ -31,27 +31,14 @@ namespace Attender.Server.Application.Categories.Queries
             _mapper = mapper;
         }
 
-        public Task<List<CategoryDto>> Handle(GetCategoriesWithSubCategoriesQuery query,CancellationToken cancellationToken)
+        public Task<List<CategoryDto>> Handle(GetCategoriesWithSubCategoriesQuery query, CancellationToken cancellationToken)
         {
-            var subCategories = _dbContext.SubCategories
-                    .AsNoTracking()
-                    .ProjectTo<SubCategoryDto>(_mapper.ConfigurationProvider)
-                    .Where(c => c.CategoryId == query.Id)
-                    .ToListAsync(cancellationToken);
-
-            var categories = _dbContext.Categories
+            return  _dbContext.Categories
+                    .Include(sc => sc.SubCategories)
                     .ProjectTo<CategoryDto>(_mapper.ConfigurationProvider)
-                   .Where(a => a.Id == query.Id)
-                    .Select(i => new CategoryDto
-                    {
-                        Id = i.Id,
-                        Name = i.Name,
-                        SubCategories = subCategories.Result
-                    })
-                     .AsNoTracking()
+                    .Where(с => query.Ids.Contains(с.Id))
+                    .AsNoTracking()
                     .ToListAsync(cancellationToken);
-
-            return categories;
         }
     }
 
