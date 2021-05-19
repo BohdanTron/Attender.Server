@@ -3,23 +3,19 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Attender.Server.Application.SubCategories.Queries
+namespace Attender.Server.Application.SubCategories.Queries.GetSubCategories
 {
-    public class GetSubCategoriesQuery : IRequest<List<SubCategoryDto>>
+    public class GetSubCategoriesQuery : IRequest<IReadOnlyCollection<SubCategoryDto>>
     {
-        [Required]
-        public int CategoryId { get; set; } 
+        public int CategoryId { get; set; }
     }
 
-    internal class GetSubCategoriesQueryHandler : IRequestHandler<GetSubCategoriesQuery, List<SubCategoryDto>>
+    internal class GetSubCategoriesQueryHandler : IRequestHandler<GetSubCategoriesQuery, IReadOnlyCollection<SubCategoryDto>>
     {
         private readonly IAttenderDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -30,13 +26,13 @@ namespace Attender.Server.Application.SubCategories.Queries
             _mapper = mapper;
         }
 
-        public Task<List<SubCategoryDto>> Handle(GetSubCategoriesQuery query, CancellationToken cancellationToken)
+        public async Task<IReadOnlyCollection<SubCategoryDto>> Handle(GetSubCategoriesQuery query, CancellationToken cancellationToken)
         {
-            return  _dbContext.SubCategories
-                    .AsNoTracking()
-                    .ProjectTo<SubCategoryDto>(_mapper.ConfigurationProvider)
-                    .Where(c => c.CategoryId == query.CategoryId)
-                    .ToListAsync(cancellationToken);
+            return await _dbContext.SubCategories
+                .AsNoTracking()
+                .ProjectTo<SubCategoryDto>(_mapper.ConfigurationProvider)
+                .Where(c => c.CategoryId == query.CategoryId)
+                .ToListAsync(cancellationToken);
         }
     }
 }

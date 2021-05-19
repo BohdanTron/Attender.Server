@@ -1,10 +1,9 @@
 ﻿using Attender.Server.API.Constants;
-using Attender.Server.Application.SubCategories.Queries;
+using Attender.Server.Application.SubCategories.Queries.GetSubCategories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 
@@ -15,14 +14,13 @@ namespace Attender.Server.API.Controllers
     public class SubCategoriesController : ApiControllerBase
     {
         /// <summary>
-        /// Get list of subcategories
+        /// Gets list of subcategories
         /// </summary>
-        /// <param name="request">Category Id</param>
-        /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<SubCategoryDto>>> Get([FromQuery] GetSubCategoriesQuery request)
+        [ProducesResponseType(typeof(IReadOnlyCollection<SubCategoryDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult> Get([FromQuery] GetSubCategoriesQuery request)
         {
-            return await Mediator.Send(request);
+            return Ok(await Mediator.Send(request));
         }
     }
 }
