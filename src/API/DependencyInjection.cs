@@ -1,7 +1,11 @@
-﻿using Attender.Server.API.Common;
-using Attender.Server.API.Constants;
+﻿using Attender.Server.API.Constants;
+using Attender.Server.API.Interceptors;
+using Attender.Server.Application.Common.Models;
 using Attender.Server.Infrastructure.Auth;
 using Attender.Server.Infrastructure.Sms;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using MicroElements.Swashbuckle.FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -9,6 +13,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -79,13 +85,22 @@ namespace Attender.Server.API
             {
                 options.InvalidModelStateResponseFactory = context =>
                 {
-                    var errors = context.ModelState.Values
+                    var error = context.ModelState.Values
                         .SelectMany(v => v.Errors)
-                        .Select(e => e.ErrorMessage);
+                        .Select(e => JsonConvert.DeserializeObject<Error>(e.ErrorMessage))
+                        .First();
 
-                    return new BadRequestObjectResult(new ErrorResponse(errors));
+                    return new BadRequestObjectResult(error);
                 };
+            })
+            .AddFluentValidation(fv =>
+            {
+                fv.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+                fv.ImplicitlyValidateChildProperties = true;
             });
+
+            ValidatorOptions.Global.CascadeMode = CascadeMode.Stop;
+            services.AddTransient<IValidatorInterceptor, UseCustomErrorModelInterceptor>();
         }
 
         public static void AddSwagger(this IServiceCollection services)
@@ -119,10 +134,18 @@ namespace Attender.Server.API
                     }
                 });
 
+                c.DescribeAllParametersInCamelCase();
+                c.SupportNonNullableReferenceTypes();
+                c.UseAllOfToExtendReferenceSchemas();
+                c.AddFluentValidationRules();
+
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
+
+            services.Configure<FluentValidationSwaggerGenOptions>(options =>
+                options.SetNotNullableIfMinLengthGreaterThenZero = true);
         }
     }
 }
