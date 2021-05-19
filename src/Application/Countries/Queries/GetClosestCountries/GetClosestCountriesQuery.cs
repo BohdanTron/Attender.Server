@@ -1,78 +1,94 @@
 ﻿using Attender.Server.Application.Cities.Queries;
 using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
+using Attender.Server.Application.Countries.DTOs;
 using Attender.Server.Application.Countries.Helpers;
-using Attender.Server.Application.Countries.Models;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
+using Attender.Server.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
 {
-    public class GetClosestCountriesQuery : IRequest<List<CountryDto>>
+    public class GetClosestCountriesQuery : IRequest<IReadOnlyCollection<CountryDto>>
     {
-        [Required]
-        public string Code { get; set; } = null!;
+        public string? Code { get; set; }
     }
 
-    internal class GetClosestCountriesHandler : IRequestHandler<GetClosestCountriesQuery, List<CountryDto>>
+    internal class GetClosestCountriesHandler : IRequestHandler<GetClosestCountriesQuery, IReadOnlyCollection<CountryDto>>
     {
+        private const int MaxCitiesCount = 5;
+        public const int MaxCountriesCount = 3;
+
         private readonly IAttenderDbContext _dbContext;
-        private readonly IMapper _mapper;
 
-        public const int ClosestCountriesCount = 3;
-
-        public GetClosestCountriesHandler(IAttenderDbContext dbContext, IMapper mapper)
+        public GetClosestCountriesHandler(IAttenderDbContext dbContext)
         {
             _dbContext = dbContext;
-            _mapper = mapper;
         }
 
-        public async Task<List<CountryDto>> Handle(GetClosestCountriesQuery query, CancellationToken cancellationToken)
+        public async Task<IReadOnlyCollection<CountryDto>> Handle(GetClosestCountriesQuery query, CancellationToken cancellationToken)
         {
-            var currentCountry = await _dbContext.Countries
-                .ProjectTo<CountryDto>(_mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync(c => c.Code == query.Code, cancellationToken);
+            if (query.Code is null)
+                return Enumerable.Empty<CountryDto>().ToList();
 
-            return await GetClosestCountries(currentCountry);
+            var currentCountry = await _dbContext.Countries
+                .FirstOrDefaultAsync(c => c.Code == query.Code && c.Supported &&
+                                          c.Longitude != null && c.Latitude != null, cancellationToken);
+
+            if (currentCountry is null)
+                return Enumerable.Empty<CountryDto>().ToList();
+
+            return await GetClosestCountriesTo(currentCountry, cancellationToken);
         }
 
-        private async Task<List<CountryDto>> GetClosestCountries(CountryDto countryDto)
+        private async Task<IReadOnlyCollection<CountryDto>> GetClosestCountriesTo(Country currentCountry, CancellationToken cancellationToken)
         {
             var allCountries = await _dbContext.Countries
-                .ProjectTo<CountryDto>(_mapper.ConfigurationProvider)
-                .Where(c => c.Supported && c.Code != countryDto.Code)
-                .ToListAsync();
+                .Where(c => c.Supported && c.Code != currentCountry.Code && c.Longitude != null && c.Latitude != null)
+                .ToListAsync(cancellationToken);
 
-            var closestCountries = new List<CountryDto>();
+            var closestCountries = new List<(Country Country, double Distance)>();
 
             foreach (var country in allCountries)
             {
+                // TODO: Make Longitude and Latitude columns not nullable in db
+                if (currentCountry.Latitude is null || currentCountry.Longitude is null ||
+                    country.Latitude is null || country.Longitude is null)
+                    continue;
+
                 var result = GetDistance(
-                                     (double)countryDto.Latitude,
-                                     (double)countryDto.Longitude,
-                                     (double)country.Latitude,
-                                     (double)country.Longitude);
+                                     (double) currentCountry.Latitude,
+                                     (double) currentCountry.Longitude,
+                                     (double) country.Latitude,
+                                     (double) country.Longitude);
 
-                country.Distance = result.Data;
+                if (!result.Succeeded)
+                    return Enumerable.Empty<CountryDto>().ToList();
 
-                country.Cities = await GetPopularCities(country.Id);
+                var distance = result.Data;
 
-                if (!result.Succeeded) return Enumerable.Empty<CountryDto>().ToList();
-
-                closestCountries.Add(country);
+                closestCountries.Add((country, distance));
             }
 
-            return closestCountries.OrderBy(c => c.Distance)
-                                    .Take(ClosestCountriesCount)
-                                    .ToList();
+            var countryIds = closestCountries.Select(c => c.Country.Id);
+            var cities = GetPopularCitiesLookup(countryIds);
+
+            return closestCountries
+                .OrderBy(c => c.Distance)
+                .Take(MaxCountriesCount)
+                .Select(c => new CountryDto
+                {
+                    Id = c.Country.Id,
+                    Code = c.Country.Code,
+                    Name = c.Country.Name,
+                    Cities = cities[c.Country.Id]
+                })
+                .ToList();
         }
 
         private static Result<double> GetDistance(
@@ -123,23 +139,26 @@ namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
             return Result.Success(distance);
         }
 
-        private async Task<List<CityDto>> GetPopularCities(int countryId)
+        private ILookup<int, CityDto> GetPopularCitiesLookup(IEnumerable<int> countryIds)
         {
-            var popularCitiesPerCountry = _dbContext.Events
-                   .Join(_dbContext.Locations, e => e.LocationId, l => l.Id, (e, l) => new { e, l })
-                   .Join(_dbContext.Cities, cl => cl.l.CityId, c => c.Id, (cl, c) => new { cl, c })
-                   .Where(a => a.c.CountryId == countryId)
-                   .GroupBy(x => new { x.c.Name, x.c.Id, x.c.CountryId })
-                   .Select(m => new CityDto
-                   {
-                       Name = m.Key.Name,
-                       Id = m.Key.Id,
-                       CountryId = m.Key.CountryId
-                   })
-                   .AsNoTracking()
-                   .ToListAsync();
+            var cities = _dbContext.Events
+                .Join(_dbContext.Locations, e => e.LocationId, l => l.Id, (e, l) => new { e, l })
+                .Join(_dbContext.Cities, el => el.l.CityId, c => c.Id, (el, c) => new { el, c })
+                .Where(elc => countryIds.Contains(elc.c.CountryId))
+                .GroupBy(elc => new { elc.c.Name, elc.c.Id, elc.c.CountryId })
+                .OrderByDescending(g => g.Count())
+                .ThenByDescending(g => g.Key.CountryId)
+                .Select(group => new CityDto
+                {
+                    Id = group.Key.Id,
+                    Name = group.Key.Name,
+                    CountryId = group.Key.CountryId
+                })
+                .Take(MaxCitiesCount)
+                .AsNoTracking()
+                .ToLookup(c => c.CountryId);
 
-            return await popularCitiesPerCountry;
+            return cities;
         }
     }
 }

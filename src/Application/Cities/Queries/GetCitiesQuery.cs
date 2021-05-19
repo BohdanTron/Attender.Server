@@ -3,10 +3,8 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -32,11 +30,11 @@ namespace Attender.Server.Application.Cities.Queries
 
         public Task<List<CityDto>> Handle(GetCitiesQuery query, CancellationToken cancellationToken)
         {
-            return  _dbContext.Cities
-                    .AsNoTracking()
-                    .ProjectTo<CityDto>(_mapper.ConfigurationProvider)
-                    .Where(c => c.Name.Contains(query.Name))
-                    .ToListAsync(cancellationToken);
+            return _dbContext.Cities
+                .AsNoTracking()
+                .ProjectTo<CityDto>(_mapper.ConfigurationProvider)
+                .Where(c => c.Name.Contains(query.Name))
+                .ToListAsync(cancellationToken);
         }
     }
 }

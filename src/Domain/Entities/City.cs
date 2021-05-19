@@ -10,6 +10,5 @@ namespace Attender.Server.Domain.Entities
 
         public virtual Country? Country { get; set; }
         public virtual ICollection<Location> Locations { get; set; } = new HashSet<Location>();
-        public virtual ICollection<City> Cities { get; set; } = new HashSet<City>();
     }
 }
