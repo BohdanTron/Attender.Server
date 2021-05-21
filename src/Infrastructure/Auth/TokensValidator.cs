@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Infrastructure.Auth
 {
-    public class TokensValidator : ITokensValidator
+    public class TokensValidator
     {
         private readonly IAttenderDbContext _context;
         private readonly TokenValidationParameters _tokenValidationParameters;

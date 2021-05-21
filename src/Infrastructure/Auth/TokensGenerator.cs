@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Infrastructure.Auth
 {
-    public class TokensGenerator : ITokensGenerator
+    public class TokensGenerator
     {
         private readonly IAttenderDbContext _dbContext;
         private readonly AuthOptions _authOptions;

@@ -12,13 +12,13 @@ namespace Attender.Server.Infrastructure.Auth
     public class AuthService : IAuthService
     {
         private readonly IAttenderDbContext _dbContext;
-        private readonly ITokensGenerator _tokensGenerator;
-        private readonly ITokensValidator _tokensValidator;
+        private readonly TokensGenerator _tokensGenerator;
+        private readonly TokensValidator _tokensValidator;
 
         public AuthService(
             IAttenderDbContext dbContext,
-            ITokensGenerator tokensGenerator,
-            ITokensValidator tokensValidator)
+            TokensGenerator tokensGenerator,
+            TokensValidator tokensValidator)
         {
             _dbContext = dbContext;
             _tokensGenerator = tokensGenerator;

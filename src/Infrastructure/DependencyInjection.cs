@@ -25,8 +25,9 @@ namespace Attender.Server.Infrastructure
                 throw new ArgumentNullException(nameof(AttenderDbContext)));
 
             services.AddTransient<IAuthService, AuthService>();
-            services.AddTransient<ITokensGenerator, TokensGenerator>();
-            services.AddTransient<ITokensValidator, TokensValidator>();
+            services.AddTransient<TokensGenerator>();
+            services.AddTransient<TokensValidator>();
+
             services.AddTransient<ISmsService, TwilioSmsService>();
 
             services.AddScoped<IBlobService, AzureBlobService>();
