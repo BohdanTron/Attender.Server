@@ -1,7 +1,7 @@
 ﻿using Attender.Server.Application.Cities.Queries;
 using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
-using Attender.Server.Application.Countries.DTOs;
+using Attender.Server.Application.Countries.Dtos;
 using Attender.Server.Application.Countries.Helpers;
 using Attender.Server.Domain.Entities;
 using MediatR;

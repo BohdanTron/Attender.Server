@@ -1,5 +1,5 @@
 ﻿using Attender.Server.API.Constants;
-using Attender.Server.Application.Countries.DTOs;
+using Attender.Server.Application.Countries.Dtos;
 using Attender.Server.Application.Countries.Queries.GetClosestCountries;
 using Attender.Server.Application.Countries.Queries.GetCountries;
 using Microsoft.AspNetCore.Authorization;

@@ -1,4 +1,4 @@
-﻿using Attender.Server.Application.Common.DTOs.Auth;
+﻿using Attender.Server.Application.Common.Dtos.Auth;
 using Attender.Server.Application.Common.Helpers;
 using FluentValidation;
 

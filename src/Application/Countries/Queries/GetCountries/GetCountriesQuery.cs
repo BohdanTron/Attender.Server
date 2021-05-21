@@ -1,6 +1,6 @@
 ﻿using Attender.Server.Application.Cities.Queries;
 using Attender.Server.Application.Common.Interfaces;
-using Attender.Server.Application.Countries.DTOs;
+using Attender.Server.Application.Countries.Dtos;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;

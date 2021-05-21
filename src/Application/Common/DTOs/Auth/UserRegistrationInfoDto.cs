@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Attender.Server.Application.Common.DTOs.Auth
+namespace Attender.Server.Application.Common.Dtos.Auth
 {
     public record UserRegistrationInfoDto
     {

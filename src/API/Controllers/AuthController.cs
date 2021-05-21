@@ -1,12 +1,12 @@
-﻿using Attender.Server.Application.Common.DTOs.Auth;
-using Attender.Server.Application.Common.DTOs.Sms;
-using Attender.Server.Application.Common.Interfaces;
+﻿using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using Attender.Server.Application.Common.Dtos.Auth;
+using Attender.Server.Application.Common.Dtos.Sms;
 
 namespace Attender.Server.API.Controllers
 {

@@ -1,4 +1,4 @@
-﻿namespace Attender.Server.Application.Common.DTOs.Sms
+﻿namespace Attender.Server.Application.Common.Dtos.Sms
 {
     public record PhoneVerificationDto
     {

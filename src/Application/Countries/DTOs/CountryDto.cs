@@ -4,7 +4,7 @@ using Attender.Server.Domain.Entities;
 using AutoMapper;
 using System.Collections.Generic;
 
-namespace Attender.Server.Application.Countries.DTOs
+namespace Attender.Server.Application.Countries.Dtos
 {
     public record CountryDto : IMapFrom<Country>
     {

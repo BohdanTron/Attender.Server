@@ -1,4 +1,4 @@
-﻿using Attender.Server.Application.Common.DTOs.Sms;
+﻿using Attender.Server.Application.Common.Dtos.Sms;
 using Attender.Server.Application.Common.Helpers;
 using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
