@@ -33,6 +33,7 @@ namespace Attender.Server.Infrastructure.Persistence
         {
             optionsBuilder
                 .LogTo(message => Debug.WriteLine(message), LogLevel.Information)
+                .EnableDetailedErrors()
                 .EnableSensitiveDataLogging();
         }
 

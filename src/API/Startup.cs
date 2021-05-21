@@ -1,4 +1,6 @@
+using Attender.Server.API.Services;
 using Attender.Server.Application;
+using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -28,10 +30,12 @@ namespace Attender.Server.API
             services.AddRouting(options => options.LowercaseUrls = true);
 
             services.AddAuthentication(Configuration);
-            services.AddAuthorization(Configuration);
+            services.AddAuthorization();
 
             services.AddControllers();
             services.AddSwagger();
+
+            services.AddSingleton<ICurrentUserService, CurrentUserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

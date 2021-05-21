@@ -66,12 +66,14 @@ namespace Attender.Server.API
             });
         }
 
-        public static void AddAuthorization(this IServiceCollection services, IConfiguration configuration)
+        public static void AddAuthorization(this IServiceCollection services)
         {
             services.AddAuthorization(options =>
             {
                 options.AddPolicy(AuthConstants.Policy.RegisteredOnly,
-                    policy => policy.RequireClaim(ClaimsIdentity.DefaultNameClaimType));
+                    policy => policy
+                        .RequireClaim(ClaimTypes.NameIdentifier)
+                        .RequireClaim(ClaimTypes.Name));
             });
         }
 

@@ -81,5 +81,11 @@ namespace Attender.Server.Application.Common.Helpers
             public static Error Invalid() =>
                 new("phone_number_invalid", "Phone number has incorrect format");
         }
+
+        public static class SubCategories
+        {
+            public static Error AlreadyAppliedForUser() =>
+                new("sub_categories_already_applied_for_user", "Given sub-categories already applied for the user");
+        }
     }
 }

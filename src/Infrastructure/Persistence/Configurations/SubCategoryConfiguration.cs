@@ -1,4 +1,5 @@
-﻿using Attender.Server.Domain.Entities;
+﻿using System.Collections.Generic;
+using Attender.Server.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -20,6 +21,14 @@ namespace Attender.Server.Infrastructure.Persistence.Configurations
                 .WithMany(p => p!.SubCategories)
                 .HasForeignKey(d => d.CategoryId)
                 .HasConstraintName("FK_SubCategories_Categories");
+
+            entity.HasMany(e => e.Users)
+                .WithMany(e => e.SubCategories)
+                .UsingEntity<Dictionary<string, object>>("UsersSubCategories",
+                    e => e.HasOne<User>().WithMany().HasForeignKey("UserId"),
+                    e => e.HasOne<SubCategory>().WithMany().HasForeignKey("SubCategoryId"),
+                    e => e.ToTable("UsersSubCategories"));
+
         }
     }
 }

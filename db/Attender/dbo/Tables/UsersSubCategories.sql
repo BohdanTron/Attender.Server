@@ -6,3 +6,6 @@
     CONSTRAINT [FK_UsersSubCategories_Users] FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users] ([Id]) ON DELETE CASCADE
 );
 
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IDX_UsersSubCategories_UserId_SubCategoryId]
+    ON [dbo].[UsersSubCategories]([UserId], [SubCategoryId]);

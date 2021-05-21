@@ -1,5 +1,7 @@
 ﻿using Attender.Server.API.Constants;
+using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
+using Attender.Server.Application.Users.Commands.CreateUserSubCategories;
 using Attender.Server.Application.Users.Queries.GetUser;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +15,18 @@ namespace Attender.Server.API.Controllers
     [Produces(MediaTypeNames.Application.Json)]
     public class UsersController : ApiControllerBase
     {
+        private readonly ICurrentUserService _currentUserService;
+
+        public UsersController(ICurrentUserService currentUserService)
+        {
+            _currentUserService = currentUserService;
+        }
+
+        /// <summary>
+        /// Gets user by given username
+        /// </summary>
+        /// <response code="200">User has been retrieved</response>
+        /// <response code="404">User doesn't exist</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
@@ -20,6 +34,32 @@ namespace Attender.Server.API.Controllers
         {
             var result = await Mediator.Send(request);
             return result.Succeeded ? Ok(result.Data) : NotFound(result.Error);
+        }
+
+        /// <summary>
+        /// Saves sub-categories for the user and returns user's id
+        /// </summary>
+        /// <response code="201">Sub-categories have been saved for the user. User's id returned</response>
+        /// <response code="400">Given sub-categories already applied for the user</response>
+        /// <response code="403">Access forbidden</response>
+        [HttpPost("{userId}/sub-categories")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<int>> SaveSubCategories([FromRoute] int userId,
+            [FromBody] CreateUserSubCategoriesDto request)
+        {
+            var currentUserId = _currentUserService.UserId;
+
+            if (currentUserId != userId) return Forbid();
+
+            var command = new CreateUserSubCategoriesCommand
+            {
+                UserId = currentUserId,
+                SubCategoryIds = request.SubCategoryIds
+            };
+            var result = await Mediator.Send(command);
+
+            return result.Succeeded ? Created(string.Empty, result.Data) : BadRequest(result.Error);
         }
     }
 }

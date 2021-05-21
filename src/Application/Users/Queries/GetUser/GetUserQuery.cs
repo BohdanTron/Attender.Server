@@ -11,7 +11,7 @@ namespace Attender.Server.Application.Users.Queries.GetUser
 {
     public class GetUserQuery : IRequest<Result<UserDto>>
     {
-        public string PhoneNumber { get; set; } = null!;
+        public string? UserName { get; set; }
     }
 
     internal class GetUserQueryHandler : IRequestHandler<GetUserQuery, Result<UserDto>>
@@ -28,8 +28,8 @@ namespace Attender.Server.Application.Users.Queries.GetUser
         public async Task<Result<UserDto>> Handle(GetUserQuery query, CancellationToken cancellationToken)
         {
             var user = await _dbContext.Users
-                .ProjectTo<UserDto?>(_mapper.ConfigurationProvider)
-                .SingleOrDefaultAsync(u => u!.PhoneNumber == query.PhoneNumber, cancellationToken);
+                .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
+                .SingleOrDefaultAsync(u => u.UserName == query.UserName, cancellationToken);
 
             return user is null
                 ? Result.Failure<UserDto>("user_not_found", "User doesn't exist")

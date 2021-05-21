@@ -42,7 +42,8 @@ namespace Attender.Server.Infrastructure.Auth
             {
                 new(JwtRegisteredClaimNames.Iss, _authOptions.Issuer),
                 new(JwtRegisteredClaimNames.Jti, jwtId),
-                new(ClaimsIdentity.DefaultNameClaimType, userName),
+                new(ClaimTypes.NameIdentifier, userId.ToString()),
+                new(ClaimTypes.Name, userName),
             };
 
             var accessToken = GenerateAccessToken(claims);
