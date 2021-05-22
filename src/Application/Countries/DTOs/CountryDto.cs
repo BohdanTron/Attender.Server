@@ -1,4 +1,4 @@
-﻿using Attender.Server.Application.Cities.Queries;
+﻿using Attender.Server.Application.Cities.Queries.GetCities;
 using Attender.Server.Application.Common.Mappings;
 using Attender.Server.Domain.Entities;
 using AutoMapper;

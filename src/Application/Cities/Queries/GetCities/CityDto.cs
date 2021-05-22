@@ -1,7 +1,7 @@
 ﻿using Attender.Server.Application.Common.Mappings;
 using Attender.Server.Domain.Entities;
 
-namespace Attender.Server.Application.Cities.Queries
+namespace Attender.Server.Application.Cities.Queries.GetCities
 {
     public record CityDto : IMapFrom<City>
     {

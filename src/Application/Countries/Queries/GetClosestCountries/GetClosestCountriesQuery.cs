@@ -1,4 +1,4 @@
-﻿using Attender.Server.Application.Cities.Queries;
+﻿using Attender.Server.Application.Cities.Queries.GetCities;
 using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
 using Attender.Server.Application.Countries.Dtos;

@@ -1,5 +1,5 @@
 ﻿using Attender.Server.API.Constants;
-using Attender.Server.Application.Cities.Queries;
+using Attender.Server.Application.Cities.Queries.GetCities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ namespace Attender.Server.API.Controllers
 {
     [Authorize(Policy = AuthConstants.Policy.RegisteredOnly)]
     [Produces(MediaTypeNames.Application.Json)]
-    public class CitiesController  : ApiControllerBase
+    public class CitiesController : ApiControllerBase
     {
         /// <summary>
         /// Gets list of cities
