@@ -1,7 +1,7 @@
 ﻿using Attender.Server.Application.Common.Models;
 using FluentValidation;
 
-namespace Attender.Server.Application.Common.Validators
+namespace Attender.Server.Application.Common.Helpers
 {
     public static class ValidatorExtensions
     {

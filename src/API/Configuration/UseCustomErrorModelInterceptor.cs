@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Linq;
 
-namespace Attender.Server.API.Interceptors
+namespace Attender.Server.API.Configuration
 {
     public class UseCustomErrorModelInterceptor : IValidatorInterceptor
     {

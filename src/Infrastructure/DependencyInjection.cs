@@ -1,4 +1,6 @@
-﻿using Attender.Server.Application.Common.Interfaces;
+﻿using Attender.Server.Application.Common.Auth.Services;
+using Attender.Server.Application.Common.Interfaces;
+using Attender.Server.Application.Common.Sms.Services;
 using Attender.Server.Infrastructure.Auth;
 using Attender.Server.Infrastructure.Blob;
 using Attender.Server.Infrastructure.Persistence;

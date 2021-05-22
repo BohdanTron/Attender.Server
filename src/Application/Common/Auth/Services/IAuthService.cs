@@ -1,8 +1,9 @@
-﻿using Attender.Server.Application.Common.Dtos.Auth;
+﻿using Attender.Server.Application.Common.Auth.Dtos;
+using Attender.Server.Application.Common.Auth.Models;
 using Attender.Server.Application.Common.Models;
 using System.Threading.Tasks;
 
-namespace Attender.Server.Application.Common.Interfaces
+namespace Attender.Server.Application.Common.Auth.Services
 {
     public interface IAuthService
     {

@@ -1,8 +1,8 @@
-﻿using Attender.Server.Application.Common.Dtos.Sms;
-using Attender.Server.Application.Common.Models;
+﻿using Attender.Server.Application.Common.Models;
+using Attender.Server.Application.Common.Sms.Dtos;
 using System.Threading.Tasks;
 
-namespace Attender.Server.Application.Common.Interfaces
+namespace Attender.Server.Application.Common.Sms.Services
 {
     public interface ISmsService
     {

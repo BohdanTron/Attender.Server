@@ -1,7 +1,7 @@
-﻿using Attender.Server.Application.Common.Dtos.Sms;
-using Attender.Server.Application.Common.Helpers;
-using Attender.Server.Application.Common.Interfaces;
+﻿using Attender.Server.Application.Common.Helpers;
 using Attender.Server.Application.Common.Models;
+using Attender.Server.Application.Common.Sms.Dtos;
+using Attender.Server.Application.Common.Sms.Services;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 using Twilio;

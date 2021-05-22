@@ -1,6 +1,5 @@
 ﻿using Attender.Server.API.Configuration;
 using Attender.Server.API.Constants;
-using Attender.Server.API.Interceptors;
 using Attender.Server.API.Services;
 using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;

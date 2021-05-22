@@ -1,12 +1,12 @@
-﻿using Attender.Server.Application.Common.Dtos.Sms;
-using Attender.Server.Application.Common.Helpers;
+﻿using Attender.Server.Application.Common.Helpers;
+using Attender.Server.Application.Common.Sms.Dtos;
 using FluentValidation;
 
-namespace Attender.Server.Application.Common.Validators.Sms
+namespace Attender.Server.Application.Common.Sms.Validators
 {
-    public class SendVerificationCodeValidator : AbstractValidator<PhoneSendingDto>
+    public class SendVerificationCodeDtoValidator : AbstractValidator<PhoneSendingDto>
     {
-        public SendVerificationCodeValidator()
+        public SendVerificationCodeDtoValidator()
         {
             RuleFor(x => x.PhoneNumber)
                 .NotEmpty()

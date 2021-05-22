@@ -1,5 +1,5 @@
-﻿using Attender.Server.Application.Common.Interfaces;
-using Attender.Server.Application.Common.Models;
+﻿using Attender.Server.Application.Common.Auth.Models;
+using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Domain.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

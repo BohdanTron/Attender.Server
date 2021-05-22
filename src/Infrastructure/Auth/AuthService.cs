@@ -1,4 +1,6 @@
-﻿using Attender.Server.Application.Common.Dtos.Auth;
+﻿using Attender.Server.Application.Common.Auth.Dtos;
+using Attender.Server.Application.Common.Auth.Models;
+using Attender.Server.Application.Common.Auth.Services;
 using Attender.Server.Application.Common.Helpers;
 using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;

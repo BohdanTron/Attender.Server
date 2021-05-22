@@ -1,12 +1,12 @@
-﻿using Attender.Server.Application.Common.Dtos.Auth;
+﻿using Attender.Server.Application.Common.Auth.Dtos;
 using Attender.Server.Application.Common.Helpers;
 using FluentValidation;
 
-namespace Attender.Server.Application.Common.Validators.Auth
+namespace Attender.Server.Application.Common.Auth.Validators
 {
-    public class RefreshTokenValidator : AbstractValidator<RefreshTokenDto>
+    public class RefreshTokenDtoValidator : AbstractValidator<RefreshTokenDto>
     {
-        public RefreshTokenValidator()
+        public RefreshTokenDtoValidator()
         {
             RuleFor(x => x.AccessToken)
                 .NotEmpty()

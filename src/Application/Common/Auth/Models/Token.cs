@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Attender.Server.Application.Common.Models
+namespace Attender.Server.Application.Common.Auth.Models
 {
     public record Token
     {
