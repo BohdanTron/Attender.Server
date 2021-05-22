@@ -1,9 +1,9 @@
 ﻿using Attender.Server.API.Configuration;
 using Attender.Server.API.Constants;
 using Attender.Server.API.Interceptors;
+using Attender.Server.API.Services;
+using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
-using Attender.Server.Infrastructure.Auth;
-using Attender.Server.Infrastructure.Sms;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MicroElements.Swashbuckle.FluentValidation;
@@ -28,10 +28,9 @@ namespace Attender.Server.API
 {
     public static class DependencyInjection
     {
-        public static void ConfigureOptions(this IServiceCollection services, IConfiguration configuration)
+        public static void AddServices(this IServiceCollection services)
         {
-            services.Configure<TwilioOptions>(configuration.GetSection("Twilio"));
-            services.Configure<AuthOptions>(configuration.GetSection("Auth"));
+            services.AddSingleton<ICurrentUserService, CurrentUserService>();
         }
 
         public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)

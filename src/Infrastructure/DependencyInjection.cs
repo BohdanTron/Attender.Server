@@ -25,10 +25,13 @@ namespace Attender.Server.Infrastructure
                 throw new ArgumentNullException(nameof(AttenderDbContext)));
 
             services.AddTransient<IAuthService, AuthService>();
+            services.Configure<AuthOptions>(options => configuration.GetSection("Auth").Bind(options));
+
             services.AddTransient<TokensGenerator>();
             services.AddTransient<TokensValidator>();
 
             services.AddTransient<ISmsService, TwilioSmsService>();
+            services.Configure<TwilioOptions>(options => configuration.GetSection("Twilio").Bind(options));
 
             services.AddScoped<IBlobService, AzureBlobService>();
             services.AddScoped(_ =>
