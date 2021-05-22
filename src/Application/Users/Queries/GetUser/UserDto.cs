@@ -10,9 +10,9 @@ namespace Attender.Server.Application.Users.Queries.GetUser
 
         public string? Email { get; set; }
 
-        public string UserName { get; set; } = null!;
+        public string UserName { get; set; } = string.Empty;
 
-        public string PhoneNumber { get; set; } = null!;
+        public string PhoneNumber { get; set; } = string.Empty;
 
         public Guid? AvatarId { get; set; }
     }
