@@ -87,5 +87,11 @@ namespace Attender.Server.Application.Common.Helpers
             public static Error AlreadyAppliedForUser() =>
                 new("sub_categories_already_applied_for_user", "Given sub-categories already applied for the user");
         }
+
+        public static class Cities
+        {
+            public static Error AlreadyAppliedForUser() =>
+                new("cities_already_applied_for_user", "Given cities already applied for the user");
+        }
     }
 }

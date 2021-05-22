@@ -42,7 +42,6 @@ namespace Attender.Server.Application.Users.Commands.CreateUserSubCategories
                 .ToListAsync(cancellationToken);
 
             subCategories.ForEach(user.SubCategories.Add);
-
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return Result.Success(user.Id);
