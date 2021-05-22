@@ -1,8 +1,6 @@
-﻿using Attender.Server.Application.Cities.Queries.GetCities;
-using Attender.Server.Application.Common.Interfaces;
+﻿using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
-using Attender.Server.Application.Countries.Dtos;
-using Attender.Server.Application.Countries.Helpers;
+using Attender.Server.Application.Countries.Services;
 using Attender.Server.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -14,24 +12,27 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
 {
-    public class GetClosestCountriesQuery : IRequest<IReadOnlyCollection<CountryDto>>
+    public class GetClosestCountriesQuery : IRequest<List<CountryDto>>
     {
         public string? Code { get; set; }
     }
 
-    internal class GetClosestCountriesHandler : IRequestHandler<GetClosestCountriesQuery, IReadOnlyCollection<CountryDto>>
+    internal class GetClosestCountriesHandler : IRequestHandler<GetClosestCountriesQuery, List<CountryDto>>
     {
-        private const int MaxCitiesCount = 5;
         public const int MaxCountriesCount = 3;
 
         private readonly IAttenderDbContext _dbContext;
+        private readonly PopularCitiesService _popularCitiesService;
 
-        public GetClosestCountriesHandler(IAttenderDbContext dbContext)
+        public GetClosestCountriesHandler(
+            IAttenderDbContext dbContext,
+            PopularCitiesService popularCitiesService)
         {
             _dbContext = dbContext;
+            _popularCitiesService = popularCitiesService;
         }
 
-        public async Task<IReadOnlyCollection<CountryDto>> Handle(GetClosestCountriesQuery query, CancellationToken cancellationToken)
+        public async Task<List<CountryDto>> Handle(GetClosestCountriesQuery query, CancellationToken cancellationToken)
         {
             if (query.Code is null)
                 return Enumerable.Empty<CountryDto>().ToList();
@@ -46,7 +47,7 @@ namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
             return await GetClosestCountriesTo(currentCountry, cancellationToken);
         }
 
-        private async Task<IReadOnlyCollection<CountryDto>> GetClosestCountriesTo(Country currentCountry, CancellationToken cancellationToken)
+        private async Task<List<CountryDto>> GetClosestCountriesTo(Country currentCountry, CancellationToken cancellationToken)
         {
             var allCountries = await _dbContext.Countries
                 .Where(c => c.Supported && c.Code != currentCountry.Code && c.Longitude != null && c.Latitude != null)
@@ -76,7 +77,7 @@ namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
             }
 
             var countryIds = closestCountries.Select(c => c.Country.Id);
-            var cities = GetPopularCitiesLookup(countryIds);
+            var cities = _popularCitiesService.Get(countryIds);
 
             return closestCountries
                 .OrderBy(c => c.Distance)
@@ -137,28 +138,6 @@ namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
             }
 
             return Result.Success(distance);
-        }
-
-        private ILookup<int, CityDto> GetPopularCitiesLookup(IEnumerable<int> countryIds)
-        {
-            var cities = _dbContext.Events
-                .Join(_dbContext.Locations, e => e.LocationId, l => l.Id, (e, l) => new { e, l })
-                .Join(_dbContext.Cities, el => el.l.CityId, c => c.Id, (el, c) => new { el, c })
-                .Where(elc => countryIds.Contains(elc.c.CountryId))
-                .GroupBy(elc => new { elc.c.Name, elc.c.Id, elc.c.CountryId })
-                .OrderByDescending(g => g.Count())
-                .ThenByDescending(g => g.Key.CountryId)
-                .Select(group => new CityDto
-                {
-                    Id = group.Key.Id,
-                    Name = group.Key.Name,
-                    CountryId = group.Key.CountryId
-                })
-                .Take(MaxCitiesCount)
-                .AsNoTracking()
-                .ToLookup(c => c.CountryId);
-
-            return cities;
         }
     }
 }

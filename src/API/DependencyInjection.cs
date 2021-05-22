@@ -1,4 +1,5 @@
-﻿using Attender.Server.API.Constants;
+﻿using Attender.Server.API.Configuration;
+using Attender.Server.API.Constants;
 using Attender.Server.API.Interceptors;
 using Attender.Server.Application.Common.Models;
 using Attender.Server.Infrastructure.Auth;
@@ -135,6 +136,9 @@ namespace Attender.Server.API
                         new List<string>()
                     }
                 });
+
+                c.CustomSchemaIds(type => type.FullName);
+                c.SchemaFilter<SwaggerNamespaceSchemaFilter>();
 
                 c.DescribeAllParametersInCamelCase();
                 c.SupportNonNullableReferenceTypes();

@@ -7,7 +7,7 @@ namespace Attender.Server.Application.Cities.Queries.GetCities
     {
         public int Id { get; init; }
 
-        public string Name { get; init; } = null!;
+        public string Name { get; init; } = string.Empty;
         
         public int CountryId { get; init; }
     }

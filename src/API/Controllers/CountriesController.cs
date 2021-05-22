@@ -1,5 +1,5 @@
 ﻿using Attender.Server.API.Constants;
-using Attender.Server.Application.Countries.Dtos;
+using Attender.Server.Application.Countries;
 using Attender.Server.Application.Countries.Queries.GetClosestCountries;
 using Attender.Server.Application.Countries.Queries.GetCountries;
 using Microsoft.AspNetCore.Authorization;
@@ -20,19 +20,19 @@ namespace Attender.Server.API.Controllers
         /// </summary>
         /// <response code="200">List of countries has been retrieved</response>
         [HttpGet]
-        [ProducesResponseType(typeof(IReadOnlyCollection<CountryDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult> Get([FromQuery] GetCountriesQuery request)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<CountryDto>>> Get([FromQuery] GetCountriesQuery request)
         {
             return Ok(await Mediator.Send(request));
         }
 
         /// <summary>
-        /// Gets closest countries with their cities
+        /// Gets closest countries with their the most popular cities
         /// </summary>
         /// <response code="200">List of the closest countries has been retrieved</response>
         [HttpGet("closest")]
-        [ProducesResponseType(typeof(IReadOnlyCollection<CountryDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult> GetClosestCountries([FromQuery] GetClosestCountriesQuery request)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<CountryDto>>> GetClosestCountries([FromQuery] GetClosestCountriesQuery request)
         {
             return Ok(await Mediator.Send(request));
         }

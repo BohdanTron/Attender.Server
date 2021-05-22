@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Attender.Server.Application.Countries.Helpers
+namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
 {
     public static class CountryCoordinatedExtension
     {
