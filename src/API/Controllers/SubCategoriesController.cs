@@ -17,8 +17,8 @@ namespace Attender.Server.API.Controllers
         /// Gets list of subcategories
         /// </summary>
         [HttpGet]
-        [ProducesResponseType(typeof(IReadOnlyCollection<SubCategoryDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult> Get([FromQuery] GetSubCategoriesQuery request)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<SubCategoryDto>>> Get([FromQuery] GetSubCategoriesQuery request)
         {
             return Ok(await Mediator.Send(request));
         }

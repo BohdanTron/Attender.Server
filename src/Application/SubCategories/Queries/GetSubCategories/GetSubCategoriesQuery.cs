@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.SubCategories.Queries.GetSubCategories
 {
-    public class GetSubCategoriesQuery : IRequest<IReadOnlyCollection<SubCategoryDto>>
+    public class GetSubCategoriesQuery : IRequest<List<SubCategoryDto>>
     {
         public int CategoryId { get; set; }
     }
 
-    internal class GetSubCategoriesQueryHandler : IRequestHandler<GetSubCategoriesQuery, IReadOnlyCollection<SubCategoryDto>>
+    internal class GetSubCategoriesQueryHandler : IRequestHandler<GetSubCategoriesQuery, List<SubCategoryDto>>
     {
         private readonly IAttenderDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -26,9 +26,9 @@ namespace Attender.Server.Application.SubCategories.Queries.GetSubCategories
             _mapper = mapper;
         }
 
-        public async Task<IReadOnlyCollection<SubCategoryDto>> Handle(GetSubCategoriesQuery query, CancellationToken cancellationToken)
+        public Task<List<SubCategoryDto>> Handle(GetSubCategoriesQuery query, CancellationToken cancellationToken)
         {
-            return await _dbContext.SubCategories
+            return _dbContext.SubCategories
                 .AsNoTracking()
                 .ProjectTo<SubCategoryDto>(_mapper.ConfigurationProvider)
                 .Where(c => c.CategoryId == query.CategoryId)

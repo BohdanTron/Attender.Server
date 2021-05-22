@@ -9,8 +9,8 @@ namespace Attender.Server.Application.Categories.Queries.GetCategories
     {
         public int Id { get; init; }
 
-        public string Name { get; init; } = null!;
+        public string Name { get; init; } = string.Empty;
 
-        public List<SubCategoryDto> SubCategories { get; init; } = null!;
+        public IEnumerable<SubCategoryDto> SubCategories { get; init; } = new List<SubCategoryDto>();
     }
 }
