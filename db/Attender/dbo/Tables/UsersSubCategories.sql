@@ -7,5 +7,7 @@
 );
 
 GO
+
 CREATE UNIQUE NONCLUSTERED INDEX [IDX_UsersSubCategories_UserId_SubCategoryId]
     ON [dbo].[UsersSubCategories]([UserId], [SubCategoryId]);
+GO
