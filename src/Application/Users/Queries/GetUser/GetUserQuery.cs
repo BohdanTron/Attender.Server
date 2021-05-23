@@ -9,10 +9,7 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Users.Queries.GetUser
 {
-    public class GetUserQuery : IRequest<Result<UserDto>>
-    {
-        public string? UserName { get; set; }
-    }
+    public record GetUserQuery(string? UserName) : IRequest<Result<UserDto>>;
 
     internal class GetUserQueryHandler : IRequestHandler<GetUserQuery, Result<UserDto>>
     {

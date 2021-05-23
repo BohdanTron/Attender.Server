@@ -10,10 +10,7 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Categories.Queries.GetCategories
 {
-    public class GetCategoriesQuery : IRequest<List<CategoryDto>>
-    {
-        public IEnumerable<int> Ids { get; set; } = new List<int>();
-    }
+    public record GetCategoriesQuery(IEnumerable<int> Ids) : IRequest<List<CategoryDto>>;
 
     internal class GetCategoriesQueryHandler : IRequestHandler<GetCategoriesQuery, List<CategoryDto>>
     {

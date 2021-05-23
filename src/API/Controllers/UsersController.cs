@@ -53,11 +53,7 @@ namespace Attender.Server.API.Controllers
 
             if (currentUserId != userId) return Forbid();
 
-            var command = new CreateUserSubCategoriesCommand
-            {
-                UserId = currentUserId,
-                SubCategoryIds = request.SubCategoryIds
-            };
+            var command = new CreateUserSubCategoriesCommand(userId, request.SubCategoryIds);
             var result = await Mediator.Send(command);
 
             return result.Succeeded ? Created(string.Empty, result.Data) : BadRequest(result.Error);
@@ -79,11 +75,7 @@ namespace Attender.Server.API.Controllers
 
             if (currentUserId != userId) return Forbid();
 
-            var command = new CreateUserCitiesCommand
-            {
-                UserId = currentUserId,
-                CityIds = request.CityIds
-            };
+            var command = new CreateUserCitiesCommand(userId, request.CityIds);
             var result = await Mediator.Send(command);
 
             return result.Succeeded ? Ok(result.Data) : BadRequest(result.Error);

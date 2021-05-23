@@ -11,10 +11,7 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Countries.Queries.GetCountries
 {
-    public class GetCountriesQuery : IRequest<List<CountryDto>>
-    {
-        public string? Name { get; set; }
-    }
+    public record GetCountriesQuery(string? Name) : IRequest<List<CountryDto>>;
 
     internal class GetCountiesQueryHandler : IRequestHandler<GetCountriesQuery, List<CountryDto>>
     {

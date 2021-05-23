@@ -10,11 +10,7 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Users.Commands.CreateUserSubCategories
 {
-    public class CreateUserSubCategoriesCommand : IRequest<Result<int>>
-    {
-        public int UserId { get; set; }
-        public IEnumerable<int> SubCategoryIds { get; set; } = new List<int>();
-    }
+    public record CreateUserSubCategoriesCommand(int UserId, IEnumerable<int> SubCategoryIds) : IRequest<Result<int>>;
 
     internal class CreateUserSubCategoriesCommandHandler : IRequestHandler<CreateUserSubCategoriesCommand, Result<int>>
     {

@@ -10,10 +10,7 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Cities.Queries.GetCities
 {
-    public class GetCitiesQuery : IRequest<List<CityDto>>
-    {
-        public string? Name { get; set; }
-    }
+    public record GetCitiesQuery(string? Name) : IRequest<List<CityDto>>;
 
     internal class GetCitiesQueryHandler : IRequestHandler<GetCitiesQuery, List<CityDto>>
     {

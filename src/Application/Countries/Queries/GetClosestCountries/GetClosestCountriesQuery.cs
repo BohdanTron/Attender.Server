@@ -12,10 +12,7 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
 {
-    public class GetClosestCountriesQuery : IRequest<List<CountryDto>>
-    {
-        public string? Code { get; set; }
-    }
+    public record GetClosestCountriesQuery(string? Code) : IRequest<List<CountryDto>>;
 
     internal class GetClosestCountriesHandler : IRequestHandler<GetClosestCountriesQuery, List<CountryDto>>
     {

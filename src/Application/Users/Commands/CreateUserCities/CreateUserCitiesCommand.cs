@@ -10,11 +10,7 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Users.Commands.CreateUserCities
 {
-    public class CreateUserCitiesCommand : IRequest<Result<int>>
-    {
-        public int UserId { get; set; }
-        public IEnumerable<int> CityIds { get; set; } = new List<int>();
-    }
+    public record CreateUserCitiesCommand(int UserId, IEnumerable<int> CityIds) : IRequest<Result<int>>;
 
     public class CreateUserCitiesCommandHandler : IRequestHandler<CreateUserCitiesCommand, Result<int>>
     {

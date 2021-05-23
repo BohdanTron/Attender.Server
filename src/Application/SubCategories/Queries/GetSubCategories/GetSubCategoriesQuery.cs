@@ -10,10 +10,7 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.SubCategories.Queries.GetSubCategories
 {
-    public class GetSubCategoriesQuery : IRequest<List<SubCategoryDto>>
-    {
-        public int CategoryId { get; set; }
-    }
+    public record GetSubCategoriesQuery(int CategoryId) : IRequest<List<SubCategoryDto>>;
 
     internal class GetSubCategoriesQueryHandler : IRequestHandler<GetSubCategoriesQuery, List<SubCategoryDto>>
     {
