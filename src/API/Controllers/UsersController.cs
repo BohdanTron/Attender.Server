@@ -38,12 +38,12 @@ namespace Attender.Server.API.Controllers
         }
 
         /// <summary>
-        /// Saves sub-categories for the user and returns user's id
+        /// Saves subcategories for the user and returns user's id
         /// </summary>
-        /// <response code="201">Sub-categories have been saved for the user. User's id returned</response>
-        /// <response code="400">Given sub-categories already applied for the user</response>
+        /// <response code="201">Subcategories have been saved for the user. User's id returned</response>
+        /// <response code="400">Given subcategories already applied for the user</response>
         /// <response code="403">Access forbidden</response>
-        [HttpPost("{userId}/sub-categories")]
+        [HttpPost("{userId:int}/sub-categories")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<int>> SaveSubCategories([FromRoute] int userId,
@@ -65,7 +65,7 @@ namespace Attender.Server.API.Controllers
         /// <response code="201">Cities have been saved for the user. User's id returned</response>
         /// <response code="400">Given cities already applied for the user</response>
         /// <response code="403">Access forbidden</response>
-        [HttpPost("{userId}/cities")]
+        [HttpPost("{userId:int}/cities")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<int>> SaveCities([FromRoute] int userId,
