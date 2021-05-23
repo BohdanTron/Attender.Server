@@ -1,11 +1,8 @@
-﻿namespace Attender.Server.Application.Common.Auth.Models
-{
-    public record AuthTokens
-    {
-        public AuthTokens(Token accessToken, Token? refreshToken = null)
-            => (AccessToken, RefreshToken) = (accessToken, refreshToken);
+﻿using System;
 
-        public Token AccessToken { get; }
-        public Token? RefreshToken { get; }
-    }
+namespace Attender.Server.Application.Common.Auth.Models
+{
+    public record AuthTokens(Token AccessToken, Token? RefreshToken = null);
+
+    public record Token(string Value, DateTime Expires);
 }

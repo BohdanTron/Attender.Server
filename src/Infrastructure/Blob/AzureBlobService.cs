@@ -33,11 +33,8 @@ namespace Attender.Server.Infrastructure.Blob
 
             await blobClient.UploadAsync(content, new BlobHttpHeaders { ContentType = contentType });
 
-            return new BlobInfo
-            {
-                Name = blobClient.Name,
-                Location = blobClient.Uri.AbsoluteUri
-            };
+            var (name, location) = (blobClient.Name, blobClient.Uri.AbsoluteUri);
+            return new BlobInfo(name, location);
         }
     }
 }
