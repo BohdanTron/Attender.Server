@@ -86,6 +86,10 @@ namespace Attender.Server.Infrastructure.Auth
             {
                 return Result.Failure<ClaimsPrincipal>(Errors.Auth.AccessTokenSecurityIssue(e.Message));
             }
+            catch (ArgumentException)
+            {
+                return Result.Failure<ClaimsPrincipal>(Errors.Auth.AccessTokenInvalid());
+            }
         }
 
         private static bool ValidateTokenAlgorithm(SecurityToken token)

@@ -27,7 +27,7 @@ namespace Attender.Server.Infrastructure.Auth
             _tokensValidator = tokensValidator;
         }
 
-        public async Task<Result<AuthTokens>> Register(UserRegistrationInfoDto dto)
+        public async Task<Result<AuthTokens>> RegisterUser(UserRegistrationInfoDto dto)
         {
             var exists = await _dbContext.Users
                 .AnyAsync(u => u.PhoneNumber == dto.PhoneNumber || u.UserName == dto.UserName ||
@@ -70,7 +70,7 @@ namespace Attender.Server.Infrastructure.Auth
 
         public async Task<Result<AuthTokens>> RefreshToken(RefreshTokenDto dto)
         {
-            var (accessToken, refreshToken) = (dto.AccessToken, dto.RefreshToken);
+            var (accessToken, refreshToken) = dto;
 
             var validation = await _tokensValidator.ValidateRefreshToken(accessToken, refreshToken);
             if (!validation.Succeeded)

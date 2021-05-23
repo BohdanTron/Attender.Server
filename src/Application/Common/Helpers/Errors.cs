@@ -33,6 +33,9 @@ namespace Attender.Server.Application.Common.Helpers
             public static Error AccessTokenInvalidAlgorithm() =>
                 new("access_token_invalid_algorithm", "Access token has invalid algorithm");
 
+            public static Error AccessTokenInvalid() =>
+                new("access_token_invalid", "Access token has incorrect format");
+
             public static Error AccessTokenSecurityIssue(string message) =>
                 new("access_token_security_issue", message);
 
