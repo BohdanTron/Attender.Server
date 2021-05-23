@@ -49,7 +49,7 @@ namespace Attender.Server.API.Controllers
         [HttpPost("verify-phone")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<AuthTokens>> VerifyPhone([FromBody] PhoneVerificationDto dto)
+        public async Task<ActionResult<AuthInfo>> VerifyPhone([FromBody] PhoneVerificationDto dto)
         {
             var verification = await _smsService.CheckVerificationCode(dto);
 
@@ -68,7 +68,7 @@ namespace Attender.Server.API.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<AuthTokens>> Register([FromBody] UserRegistrationInfoDto dto)
+        public async Task<ActionResult<AuthInfo>> Register([FromBody] UserRegistrationInfoDto dto)
         {
             var result = await _authService.RegisterUser(dto);
 

@@ -27,7 +27,7 @@ namespace Attender.Server.Infrastructure.Auth
             _tokensValidator = tokensValidator;
         }
 
-        public async Task<Result<AuthTokens>> RegisterUser(UserRegistrationInfoDto dto)
+        public async Task<Result<AuthInfo>> RegisterUser(UserRegistrationInfoDto dto)
         {
             var exists = await _dbContext.Users
                 .AnyAsync(u => u.PhoneNumber == dto.PhoneNumber || u.UserName == dto.UserName ||
@@ -35,7 +35,7 @@ namespace Attender.Server.Infrastructure.Auth
 
             if (exists)
             {
-                return Result.Failure<AuthTokens>(Errors.User.Exists());
+                return Result.Failure<AuthInfo>(Errors.User.Exists());
             }
 
             var user = new User
@@ -51,21 +51,25 @@ namespace Attender.Server.Infrastructure.Auth
             await _dbContext.SaveChangesAsync();
 
             var tokens = await _tokensGenerator.GenerateAuthTokens(user.Id, user.UserName);
-            return Result.Success(tokens);
+            var result = new AuthInfo(tokens, user.Id);
+
+            return Result.Success(result);
         }
 
-        public async Task<AuthTokens> LoginOrGenerateAccessToken(string phoneNumber)
+        public async Task<AuthInfo> LoginOrGenerateAccessToken(string phoneNumber)
         {
             var user = await _dbContext.Users
                 .SingleOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
 
             if (user is not null)
             {
-                return await _tokensGenerator.GenerateAuthTokens(user.Id, user.UserName);
+                var tokens = await _tokensGenerator.GenerateAuthTokens(user.Id, user.UserName);
+                return new AuthInfo(tokens, user.Id);
             }
+            
+            var accessToken = new AuthTokens(_tokensGenerator.GenerateAccessToken());
 
-            var accessToken = _tokensGenerator.GenerateAccessToken();
-            return new AuthTokens(accessToken);
+            return new AuthInfo(accessToken);
         }
 
         public async Task<Result<AuthTokens>> RefreshToken(RefreshTokenDto dto)
