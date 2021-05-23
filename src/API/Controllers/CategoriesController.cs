@@ -18,9 +18,10 @@ namespace Attender.Server.API.Controllers
         /// </summary>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<CategoryDto>>> Get([FromQuery] GetCategoriesQuery request)
+        public async Task<ActionResult<List<CategoryDto>>> Get()
         {
-            return Ok(await Mediator.Send(request));
+            var query = new GetCategoriesQuery();
+            return Ok(await Mediator.Send(query));
         }
     }
 }

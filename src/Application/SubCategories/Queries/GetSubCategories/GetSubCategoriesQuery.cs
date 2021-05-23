@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.SubCategories.Queries.GetSubCategories
 {
-    public record GetSubCategoriesQuery(int CategoryId) : IRequest<List<SubCategoryDto>>;
+    public record GetSubCategoriesQuery(string Name) : IRequest<List<SubCategoryDto>>;
 
     internal class GetSubCategoriesQueryHandler : IRequestHandler<GetSubCategoriesQuery, List<SubCategoryDto>>
     {
@@ -27,8 +27,8 @@ namespace Attender.Server.Application.SubCategories.Queries.GetSubCategories
         {
             return _dbContext.SubCategories
                 .AsNoTracking()
+                .Where(s => query.Name.Contains(s.Name))
                 .ProjectTo<SubCategoryDto>(_mapper.ConfigurationProvider)
-                .Where(c => c.CategoryId == query.CategoryId)
                 .ToListAsync(cancellationToken);
         }
     }

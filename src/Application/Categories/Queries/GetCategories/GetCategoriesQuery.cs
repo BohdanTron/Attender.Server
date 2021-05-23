@@ -1,6 +1,4 @@
 ﻿using Attender.Server.Application.Common.Interfaces;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -10,25 +8,36 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Categories.Queries.GetCategories
 {
-    public record GetCategoriesQuery(IEnumerable<int> Ids) : IRequest<List<CategoryDto>>;
+    public record GetCategoriesQuery : IRequest<List<CategoryDto>>;
 
     internal class GetCategoriesQueryHandler : IRequestHandler<GetCategoriesQuery, List<CategoryDto>>
     {
-        private readonly IAttenderDbContext _dbContext;
-        private readonly IMapper _mapper;
+        private const int MaxSubCategoriesCount = 6;
 
-        public GetCategoriesQueryHandler(IAttenderDbContext dbContext, IMapper mapper)
+        private readonly IAttenderDbContext _dbContext;
+
+        public GetCategoriesQueryHandler(IAttenderDbContext dbContext)
         {
             _dbContext = dbContext;
-            _mapper = mapper;
         }
 
         public Task<List<CategoryDto>> Handle(GetCategoriesQuery query, CancellationToken cancellationToken)
         {
             return _dbContext.Categories
                 .AsNoTracking()
-                .ProjectTo<CategoryDto>(_mapper.ConfigurationProvider)
-                .Where(с => query.Ids.Contains(с.Id))
+                .Select(c => new CategoryDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    SubCategories = c.SubCategories
+                        .Select(s => new SubCategoryDto
+                        {
+                            Id = s.Id,
+                            Name = s.Name,
+                            CategoryId = s.CategoryId
+                        })
+                        .Take(MaxSubCategoriesCount)
+                })
                 .ToListAsync(cancellationToken);
         }
     }
