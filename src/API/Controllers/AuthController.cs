@@ -29,10 +29,10 @@ namespace Attender.Server.API.Controllers
         /// </summary>
         /// <response code="204">Verification code successfully sent</response>
         /// <response code="400">Phone number is invalid</response>
-        [HttpPost("send-verification-phone-code")]
+        [HttpPost("send-phone-code")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> SendVerificationPhoneCode([FromBody] PhoneSendingDto dto)
+        public async Task<ActionResult> SendPhoneCode([FromBody] PhoneSendingDto dto)
         {
             var result = await _smsService.SendVerificationCode(dto);
 
