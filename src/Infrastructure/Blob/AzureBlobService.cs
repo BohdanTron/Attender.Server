@@ -4,7 +4,6 @@ using Azure.Storage.Blobs.Models;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-
 using BlobInfo = Attender.Server.Application.Common.Models.BlobInfo;
 
 namespace Attender.Server.Infrastructure.Blob

@@ -5,6 +5,7 @@ using Attender.Server.Infrastructure.Auth;
 using Attender.Server.Infrastructure.Blob;
 using Attender.Server.Infrastructure.Persistence;
 using Attender.Server.Infrastructure.Sms;
+using Azure.Identity;
 using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -37,7 +38,7 @@ namespace Attender.Server.Infrastructure
 
             services.AddScoped<IBlobService, AzureBlobService>();
             services.AddScoped(_ =>
-                new BlobServiceClient(configuration.GetConnectionString("AzureBlobStorage")));
+                new BlobServiceClient(new Uri(configuration["AzureBlob:Url"]), new DefaultAzureCredential()));
 
             return services;
         }
