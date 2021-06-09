@@ -1,39 +1,33 @@
 ﻿using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Domain.Entities;
-using Azure.Core;
-using Azure.Identity;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
 namespace Attender.Server.Infrastructure.Persistence
 {
-    public sealed class AttenderDbContext : DbContext, IAttenderDbContext
+    public class AttenderDbContext : DbContext, IAttenderDbContext
     {
+        public AttenderDbContext()
+        {
+        }
+
         public AttenderDbContext(DbContextOptions<AttenderDbContext> options)
             : base(options)
         {
-            var connection = (SqlConnection) Database.GetDbConnection();
-            var credential = new DefaultAzureCredential();
-
-            var azureSqlScopes = new[] { "https://database.windows.net/.default" };
-            var accessToken = credential.GetToken(new TokenRequestContext(azureSqlScopes));
-
-            connection.AccessToken = accessToken.Token;
         }
 
-        public DbSet<Artist> Artists => Set<Artist>();
-        public DbSet<Category> Categories => Set<Category>();
-        public DbSet<City> Cities => Set<City>();
-        public DbSet<Country> Countries => Set<Country>();
-        public DbSet<Event> Events => Set<Event>();
-        public DbSet<Location> Locations => Set<Location>();
-        public DbSet<Role> Roles => Set<Role>();
-        public DbSet<SubCategory> SubCategories => Set<SubCategory>();
-        public DbSet<Ticket> Tickets => Set<Ticket>();
-        public DbSet<User> Users => Set<User>();
-        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+        public virtual DbSet<Artist> Artists => Set<Artist>();
+        public virtual DbSet<Category> Categories => Set<Category>();
+        public virtual DbSet<City> Cities => Set<City>();
+        public virtual DbSet<Country> Countries => Set<Country>();
+        public virtual DbSet<Event> Events => Set<Event>();
+        public virtual DbSet<Location> Locations => Set<Location>();
+        public virtual DbSet<Role> Roles => Set<Role>();
+        public virtual DbSet<SubCategory> SubCategories => Set<SubCategory>();
+        public virtual DbSet<Ticket> Tickets => Set<Ticket>();
+        public virtual DbSet<User> Users => Set<User>();
+        public virtual DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
