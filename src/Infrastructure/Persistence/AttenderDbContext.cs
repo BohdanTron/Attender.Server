@@ -1,5 +1,8 @@
 ﻿using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Domain.Entities;
+using Azure.Core;
+using Azure.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
@@ -15,6 +18,13 @@ namespace Attender.Server.Infrastructure.Persistence
         public AttenderDbContext(DbContextOptions<AttenderDbContext> options)
             : base(options)
         {
+            var connection = (SqlConnection) Database.GetDbConnection();
+            var credential = new DefaultAzureCredential();
+
+            var azureSqlScopes = new[] { "https://database.windows.net/.default" };
+            var accessToken = credential.GetToken(new TokenRequestContext(azureSqlScopes));
+
+            connection.AccessToken = accessToken.Token;
         }
 
         public virtual DbSet<Artist> Artists => Set<Artist>();
