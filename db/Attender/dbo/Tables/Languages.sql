@@ -1,0 +1,9 @@
+﻿CREATE TABLE [dbo].[Languages]
+(
+	[Id] INT IDENTITY(1, 1) NOT NULL, 
+    [Name] VARCHAR(100) NOT NULL, 
+    [Code] VARCHAR(10) NOT NULL,
+
+    CONSTRAINT [PK_Languages] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [UC_Languages_Code] UNIQUE NONCLUSTERED ([Code] ASC)
+)
