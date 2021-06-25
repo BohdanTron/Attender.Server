@@ -5,7 +5,7 @@
     [PhoneNumber]   VARCHAR (25)        NOT NULL,
     [AvatarId]      UNIQUEIDENTIFIER    NULL,
     [RoleId]        TINYINT             NOT NULL,
-    [LanguageId]    INT                 NOT NULL DEFAULT (1),
+    [LanguageId]    INT                 NOT NULL,
 
     CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_Users_Roles] FOREIGN KEY ([RoleId]) REFERENCES [dbo].[Roles] ([Id]) ON DELETE CASCADE,
