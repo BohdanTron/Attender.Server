@@ -35,7 +35,7 @@ namespace Attender.Server.API
         public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             var issuer = configuration["Auth:Issuer"];
-            var key = Encoding.ASCII.GetBytes(configuration["Auth:SecurityKey"]);
+            var key = Encoding.ASCII.GetBytes(configuration["Auth:Key"]);
 
             var tokenParameters = new TokenValidationParameters
             {

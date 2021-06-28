@@ -54,7 +54,7 @@ namespace Attender.Server.Infrastructure.Auth
 
         private Token GenerateAccessToken(IEnumerable<Claim> claims)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_authOptions.SecurityKey));
+            var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_authOptions.Key));
             var expires = DateTime.UtcNow.AddMinutes(_authOptions.LifetimeMinutes);
 
             var jwt = new JwtSecurityToken(
