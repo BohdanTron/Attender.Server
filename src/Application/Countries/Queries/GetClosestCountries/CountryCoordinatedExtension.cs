@@ -6,12 +6,7 @@ namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
     {
         public static double ToRadian(this double d)
         {
-            return d * (Math.PI / 180);
-        }
-
-        public static double ToDegrees(this double r)
-        {
-            return r * 180 / Math.PI;
+            return (d * Math.PI) / 180.0;
         }
     }
 }

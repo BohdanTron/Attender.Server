@@ -60,10 +60,10 @@ namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
                     continue;
 
                 var result = GetDistance(
-                                     (double) currentCountry.Latitude,
-                                     (double) currentCountry.Longitude,
-                                     (double) country.Latitude,
-                                     (double) country.Longitude);
+                                     (double)currentCountry.Latitude,
+                                     (double)currentCountry.Longitude,
+                                     (double)country.Latitude,
+                                     (double)country.Longitude);
 
                 if (!result.Succeeded)
                     return Enumerable.Empty<CountryDto>().ToList();
@@ -108,29 +108,26 @@ namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
                 return Result.Success(0.0);
             }
 
-            var theta = currentLongitude - nextLongitude;
+            var thetaLongtitude = currentLongitude.ToRadian() - nextLongitude.ToRadian();
+            var thetaLatitude = currentLatitude.ToRadian() - nextLatitude.ToRadian();
+
 
             // Calculate distance between points of two locations in radians
-            var distance = Math.Sin(currentLatitude.ToRadian()) * Math.Sin(nextLatitude.ToRadian())
-                            + Math.Cos(currentLatitude).ToRadian() * Math.Cos(nextLatitude.ToRadian())
-                            * Math.Cos(theta.ToRadian());
+            var distance = Math.Pow(Math.Sin(thetaLatitude / 2), 2) + Math.Cos(currentLatitude.ToRadian())
+                                     * Math.Cos(nextLatitude.ToRadian())
+                                     * Math.Pow(Math.Sin(thetaLongtitude / 2), 2);
 
-            distance = Math.Acos(distance);
-
-            // Convert to degrees
-            distance = distance.ToDegrees();
-
-            // 1.1515 is the number of statute miles in a nautical mile
-            distance = distance * 60 * 1.1515;
+            distance = 2 * Math.Asin(Math.Sqrt(distance));
 
             switch (unit)
             {
-                // 60 * 1.1515 * 1.609344 kilometers to one degree
+              //Radius of earth in kilometers.
                 case 'K':
-                    distance *= 1.609344;
+                    distance *= 6371;
                     break;
+                //Radius of earth in miles.
                 case 'N':
-                    distance *= 0.8684;
+                    distance *= 3956;
                     break;
             }
 
