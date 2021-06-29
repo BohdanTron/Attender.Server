@@ -11,17 +11,20 @@ namespace Attender.Server.API.Controllers
 {
     [Authorize(Policy = AuthConstants.Policy.RegisteredOnly)]
     [Produces(MediaTypeNames.Application.Json)]
+    [Route("api/{languageCode}/categories")]
     public class CategoriesController : ApiControllerBase
     {
         /// <summary>
-        /// Get categories with appropriate subcategories
+        /// Gets categories with appropriate subcategories
         /// </summary>
+        /// <response code="200">List of categories has been retrieved</response>
+        /// <response code="404">Requested language code is not supported</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<CategoryDto>>> Get()
+        public async Task<ActionResult<List<CategoryDto>>> Get(string languageCode)
         {
-            var query = new GetCategoriesQuery();
-            return Ok(await Mediator.Send(query));
+            var result = await Mediator.Send(new GetCategoriesQuery(languageCode));
+            return result.Succeeded ? Ok(result.Data) : NotFound(result.Error);
         }
     }
 }

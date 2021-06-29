@@ -11,8 +11,10 @@ namespace Attender.Server.Domain.Entities
         public string PhoneNumber { get; set; } = default!;
         public Guid? AvatarId { get; set; }
         public byte RoleId { get; set; }
+        public int LanguageId { get; set; }
 
         public virtual Role? Role { get; set; }
+        public virtual Language? Language { get; set; }
         public virtual ICollection<Ticket> Tickets { get; set; } = new HashSet<Ticket>();
         public virtual ICollection<Artist> Artists { get; set; } = new HashSet<Artist>();
         public virtual ICollection<City> Cities { get; set; } = new HashSet<City>();

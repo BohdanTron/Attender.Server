@@ -1,4 +1,6 @@
-﻿using Attender.Server.Application.Common.Interfaces;
+﻿using Attender.Server.Application.Common.Helpers;
+using Attender.Server.Application.Common.Interfaces;
+using Attender.Server.Application.Common.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -8,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Categories.Queries.GetCategories
 {
-    public record GetCategoriesQuery : IRequest<List<CategoryDto>>;
+    public record GetCategoriesQuery(string LanguageCode) : IRequest<Result<List<CategoryDto>>>;
 
-    internal class GetCategoriesQueryHandler : IRequestHandler<GetCategoriesQuery, List<CategoryDto>>
+    internal class GetCategoriesQueryHandler : IRequestHandler<GetCategoriesQuery, Result<List<CategoryDto>>>
     {
         private const int MaxSubCategoriesCount = 6;
 
@@ -21,14 +23,26 @@ namespace Attender.Server.Application.Categories.Queries.GetCategories
             _dbContext = dbContext;
         }
 
-        public Task<List<CategoryDto>> Handle(GetCategoriesQuery query, CancellationToken cancellationToken)
+        public async Task<Result<List<CategoryDto>>> Handle(GetCategoriesQuery query, CancellationToken cancellationToken)
         {
-            return _dbContext.Categories
+            var languageId = await _dbContext.Languages
+                .Where(l => l.Code == query.LanguageCode)
+                .Select(l => l.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (languageId == default)
+                return Result.Failure<List<CategoryDto>>(Errors.Language.CodeNotExist());
+
+            var categories = await _dbContext.Categories
                 .AsNoTracking()
                 .Select(c => new CategoryDto
                 {
                     Id = c.Id,
                     Name = c.Name,
+                    Description = c.CategoryDescriptions
+                        .Where(d => d.CategoryId == c.Id && d.LanguageId == languageId)
+                        .Select(d => d.Text)
+                        .First(),
                     SubCategories = c.SubCategories
                         .Select(s => new SubCategoryDto
                         {
@@ -39,6 +53,8 @@ namespace Attender.Server.Application.Categories.Queries.GetCategories
                         .Take(MaxSubCategoriesCount)
                 })
                 .ToListAsync(cancellationToken);
+
+            return Result.Success(categories);
         }
     }
 

@@ -38,6 +38,8 @@ namespace Attender.Server.Infrastructure.Persistence
         public virtual DbSet<Ticket> Tickets => Set<Ticket>();
         public virtual DbSet<User> Users => Set<User>();
         public virtual DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+        public virtual DbSet<Language> Languages => Set<Language>();
+        public virtual DbSet<CategoryDescription> CategoryDescriptions => Set<CategoryDescription>();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

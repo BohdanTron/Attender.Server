@@ -63,7 +63,7 @@ namespace Attender.Server.API.Controllers
         /// Registers a user in the system
         /// </summary>
         /// <response code="200">User successfully registered</response>
-        /// <response code="400">User with such settings already exists</response>
+        /// <response code="400">User settings are invalid</response>
         [HttpPost("register")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]

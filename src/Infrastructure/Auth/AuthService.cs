@@ -38,13 +38,20 @@ namespace Attender.Server.Infrastructure.Auth
                 return Result.Failure<AuthInfo>(Errors.User.Exists());
             }
 
+            var language = await _dbContext.Languages.FirstOrDefaultAsync(l => l.Code == dto.LanguageCode);
+            if (language is null)
+            {
+                return Result.Failure<AuthInfo>(Errors.Language.CodeNotExist());
+            }
+
             var user = new User
             {
                 PhoneNumber = dto.PhoneNumber,
                 UserName = dto.UserName,
                 Email = dto.Email,
                 RoleId = (byte) Role.User,
-                AvatarId = dto.AvatarId
+                AvatarId = dto.AvatarId,
+                Language = language
             };
 
             await _dbContext.Users.AddAsync(user);

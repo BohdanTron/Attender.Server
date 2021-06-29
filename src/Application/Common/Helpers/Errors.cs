@@ -96,5 +96,11 @@ namespace Attender.Server.Application.Common.Helpers
             public static Error AlreadyAppliedForUser() =>
                 new("cities_already_applied_for_user", "Given cities already applied for the user");
         }
+
+        public static class Language
+        {
+            public static Error CodeNotExist() =>
+                new("language_code_not_exist", "Language code doesn't exist or it's not supported by the system");
+        }
     }
 }

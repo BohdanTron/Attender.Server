@@ -36,6 +36,11 @@ namespace Attender.Server.Infrastructure.Persistence.Configurations
                 .WithMany(p => p!.Users)
                 .HasForeignKey(d => d.RoleId)
                 .HasConstraintName("FK_Users_Roles");
+
+            entity.HasOne(d => d.Language)
+                .WithMany(p => p!.Users)
+                .HasForeignKey(d => d.LanguageId)
+                .HasConstraintName("FK_Users_Languages");
         }
     }
 }
