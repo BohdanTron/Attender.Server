@@ -33,16 +33,11 @@ namespace Attender.Server.Infrastructure.Auth
                 .AnyAsync(u => u.PhoneNumber == dto.PhoneNumber || u.UserName == dto.UserName ||
                                dto.Email != null && u.Email == dto.Email);
 
-            if (exists)
-            {
-                return Result.Failure<AuthInfo>(Errors.User.Exists());
-            }
+            if (exists) return Result.Failure<AuthInfo>(Errors.User.Exists());
 
             var language = await _dbContext.Languages.FirstOrDefaultAsync(l => l.Code == dto.LanguageCode);
-            if (language is null)
-            {
+            if (language is null) 
                 return Result.Failure<AuthInfo>(Errors.Language.CodeNotExist());
-            }
 
             var user = new User
             {
@@ -75,7 +70,6 @@ namespace Attender.Server.Infrastructure.Auth
             }
             
             var accessToken = new AuthTokens(_tokensGenerator.GenerateAccessToken());
-
             return new AuthInfo(accessToken);
         }
 
@@ -85,9 +79,7 @@ namespace Attender.Server.Infrastructure.Auth
 
             var validation = await _tokensValidator.ValidateRefreshToken(accessToken, refreshToken);
             if (!validation.Succeeded)
-            {
                 return Result.Failure<AuthTokens>(validation.Error!);
-            }
 
             var storedToken = validation.Data;
 
