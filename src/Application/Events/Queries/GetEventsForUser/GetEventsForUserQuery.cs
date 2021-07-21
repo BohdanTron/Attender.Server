@@ -30,28 +30,18 @@ namespace Attender.Server.Application.Events.Queries.GetEventsForUser
         public async Task<List<EventDto>> Handle(GetEventsForUserQuery query, CancellationToken cancellationToken)
         {
             var events = await _dbContext.Events
-                //.Join(_dbContext.Locations, e => e.LocationId, l => l.Id, (e, l) => new { e, l })
-                //.Join(_dbContext.SubCategories, es => es.e.SubCategoryId, sb => sb.Id, (es, sb) => new { es, sb })
-                //.Join(_dbContext.Users, us => us.sb.Id, u => u.Id, (us, u) => new { us, u })
-                // .Where(a => a.u.Id.Equals(query.Id))
-                // .Select(events => new EventDto
-                // {
-                //     Id = events.us.es.e.Id,
-                //     Name = events.us.es.e.Name,
-                //     Description = events.us.es.e.Description
-                // })
-                .Include(l => l.Location)
-                .Include(usb => usb.SubCategory)
-                .Include(u => u.Users)
-               // .Where(a => a.Users.Select(x => x.Id).Equals(query.Id))
-                .Where(a => a.Id.Equals(query.Id))
-                ////.Select(e => new EventDto
-                ////{
-                ////    Id = e.Id,
-                ////    Name = e.Name,
-                ////    Description = e.Description
-                ////})
-                 .ProjectTo<EventDto>(_mapper.ConfigurationProvider)
+                .Where(e => e.Users.Any(u => u.Id == query.Id && u.Locations.Any() && u.SubCategories.Any()))
+                .ProjectTo<EventDto>(_mapper.ConfigurationProvider)
+                .ToListAsync(cancellationToken);
+
+
+            var events2 = await _dbContext.Users
+                .Where(u => u.Id == query.Id && u.SubCategories.Any() && u.Locations.Any())
+                .SelectMany(u => u.Events.Select(e => new EventDto
+                {
+                    Id = e.Id,
+                    Name = e.Name
+                }))
                 .ToListAsync(cancellationToken);
 
             return events;
