@@ -24,8 +24,7 @@ namespace Attender.Server.Infrastructure
             });
 
             services.AddScoped<IAttenderDbContext>(provider =>
-                provider.GetService<AttenderDbContext>() ??
-                throw new ArgumentNullException(nameof(AttenderDbContext)));
+                provider.GetRequiredService<AttenderDbContext>());
 
             services.AddTransient<IAuthService, AuthService>();
             services.Configure<AuthOptions>(options => configuration.GetSection("Auth").Bind(options));
