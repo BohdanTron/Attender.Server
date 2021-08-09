@@ -27,24 +27,53 @@ namespace Attender.Server.Application.IntegrationTests.Cities.Queries
 
             public Task InitializeAsync()
             {
-                var country = new Country
+                var countries = new List<Country>
                 {
-                    Code = "ua",
-                    Name = "Ukraine",
-                    Latitude = 0,
-                    Longitude = 0,
-                    Supported = true,
-                    Cities = new List<City>
-                     {
-                         new() {Name = "Chernihiv"},
-                         new() {Name = "Lviv"},
-                         new() {Name = "Kyiv"},
-                         new() {Name = "Odessa"},
-                         new() {Name = "Cherkasy"},
-                         new() {Name = "Chernivtsi"}
-                     }
+                    new()
+                    {
+                        Code = "ua",
+                        Name = "Ukraine",
+                        Latitude = 0,
+                        Longitude = 0,
+                        Supported = true,
+                        Cities = new List<City>
+                        {
+                            new() {Name = "Chernihiv"},
+                            new() {Name = "Lviv"},
+                            new() {Name = "Kyiv"},
+                            new() {Name = "Odessa"},
+                            new() {Name = "Cherkasy"},
+                            new() {Name = "Chernivtsi"}
+                        }
+                    },
+                    new()
+                    {
+                        Code = "en",
+                        Name = "England",
+                        Latitude = 0,
+                        Longitude = 0,
+                        Supported = false,
+                        Cities = new List<City>()
+                        {
+                            new() {Name = "London"},
+                            new() {Name = "Chernihiv England"}
+                        }
+                    },
+                    new()
+                    {
+                        Code = "us",
+                        Name = "USA",
+                        Latitude = 0,
+                        Longitude = 0,
+                        Supported = false,
+                        Cities = new List<City>()
+                        {
+                            new() {Name = "Washington"},
+                            new() {Name = "Chernihiv USA"}
+                        }
+                    }
                 };
-                return _fixture.InsertAsync(country);
+                return _fixture.InsertRangeAsync(countries);
             }
 
             public Task DisposeAsync()
@@ -57,25 +86,32 @@ namespace Attender.Server.Application.IntegrationTests.Cities.Queries
         [InlineData("Cher")]
         [InlineData("cher")]
         [InlineData("che")]
-        public async Task ShouldReturnCitiesWhichContainInputName(string cityName)
+        public async Task ShouldReturnSpecificCitiesFromSupportedCountries(string cityName)
         {
-            // Act
+            var supportedCountry = await _fixture.GetAsync<Country>(c => c.Code == "ua");
+            
             var query = new GetCitiesQuery(cityName);
             var result = await _fixture.SendAsync(query);
-
-            // Assert
+            
             result.Should().NotBeNullOrEmpty();
             result.Should().HaveCount(3);
-            result.All(c => c.Name.Contains(cityName, StringComparison.InvariantCultureIgnoreCase)).Should().BeTrue();
+            result.All(c =>
+                c.Name.Contains(cityName, StringComparison.InvariantCultureIgnoreCase) &&
+                c.CountryId == supportedCountry.Id)
+                .Should().BeTrue();
         }
 
         [Fact]
-        public async Task ShouldReturnEmptyList()
+        public async Task ShouldReturnAllCitiesFromSupportedCountries()
         {
+            var supportedCountry = await _fixture.GetAsync<Country>(c => c.Code == "ua");
+            
             var query = new GetCitiesQuery(null);
             var result = await _fixture.SendAsync(query);
-
-            result.Should().BeEmpty();
+            
+            result.Should().NotBeNullOrEmpty();
+            result.Should().HaveCount(6);
+            result.All(c => c.CountryId == supportedCountry.Id).Should().BeTrue();
         }
     }
 }

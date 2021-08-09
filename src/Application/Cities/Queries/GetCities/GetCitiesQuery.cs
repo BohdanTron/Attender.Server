@@ -1,10 +1,13 @@
 ﻿using Attender.Server.Application.Common.Interfaces;
+using Attender.Server.Domain.Entities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,14 +28,18 @@ namespace Attender.Server.Application.Cities.Queries.GetCities
 
         public Task<List<CityDto>> Handle(GetCitiesQuery query, CancellationToken cancellationToken)
         {
-            if (query.Name is null)
-                return Task.FromResult(Enumerable.Empty<CityDto>().ToList());
-
             return _dbContext.Cities
-                .AsNoTracking()
+                .Where(CitiesPredicate(query))
                 .ProjectTo<CityDto>(_mapper.ConfigurationProvider)
-                .Where(c => c.Name.Contains(query.Name))
+                .AsNoTracking()
                 .ToListAsync(cancellationToken);
+        }
+
+        private static Expression<Func<City, bool>> CitiesPredicate(GetCitiesQuery query)
+        {
+            return c => query.Name == null
+                ? c.Country!.Supported
+                : c.Country!.Supported && c.Name.Contains(query.Name);
         }
     }
 }

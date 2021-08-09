@@ -2,9 +2,14 @@
 using Attender.Server.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Respawn;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -39,6 +44,27 @@ namespace Attender.Server.Application.IntegrationTests
 
             await context.AddAsync(entity);
             await context.SaveChangesAsync();
+        }
+
+        public async Task InsertRangeAsync<TEntity>(IEnumerable<TEntity> entities)
+            where TEntity : class
+        {
+            using var scope = _scopeFactory.CreateScope();
+
+            await using var context = scope.ServiceProvider.GetRequiredService<AttenderDbContext>();
+
+            await context.AddRangeAsync(entities);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task<TEntity> GetAsync<TEntity>(Expression<Func<TEntity, bool>> expression)
+            where TEntity : class
+        {
+            using var scope = _scopeFactory.CreateScope();
+
+            await using var context = scope.ServiceProvider.GetRequiredService<AttenderDbContext>();
+
+            return await context.Set<TEntity>().Where(expression).FirstOrDefaultAsync();
         }
 
         public async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)
