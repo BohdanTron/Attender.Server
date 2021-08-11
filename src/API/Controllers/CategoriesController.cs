@@ -24,7 +24,9 @@ namespace Attender.Server.API.Controllers
         public async Task<ActionResult<List<CategoryDto>>> Get(string languageCode)
         {
             var result = await Mediator.Send(new GetCategoriesQuery(languageCode));
-            return result.Succeeded ? Ok(result.Data) : NotFound(result.Error);
+            return result.Succeeded 
+                ? Ok(result.Data) 
+                : NotFound(result.Error);
         }
     }
 }

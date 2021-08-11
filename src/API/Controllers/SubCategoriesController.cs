@@ -47,7 +47,9 @@ namespace Attender.Server.API.Controllers
             var command = new CreateUserSubCategoriesCommand(userId, request.SubCategoryIds);
             var result = await Mediator.Send(command);
 
-            return result.Succeeded ? Created(string.Empty, result.Data) : BadRequest(result.Error);
+            return result.Succeeded 
+                ? Created(string.Empty, result.Data) 
+                : BadRequest(result.Error);
         }
     }
 }

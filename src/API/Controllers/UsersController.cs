@@ -24,7 +24,9 @@ namespace Attender.Server.API.Controllers
         public async Task<ActionResult<UserDto>> Get([FromQuery] GetUserQuery request)
         {
             var result = await Mediator.Send(request);
-            return result.Succeeded ? Ok(result.Data) : NotFound(result.Error);
+            return result.Succeeded 
+                ? Ok(result.Data) 
+                : NotFound(result.Error);
         }
     }
 }

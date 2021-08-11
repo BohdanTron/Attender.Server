@@ -35,10 +35,9 @@ namespace Attender.Server.API.Controllers
         public async Task<ActionResult> SendPhoneCode([FromBody] PhoneSendingDto dto)
         {
             var result = await _smsService.SendVerificationCode(dto);
-
-            if (result.Succeeded) return NoContent();
-
-            return BadRequest(result.Error);
+            return result.Succeeded 
+                ? NoContent() 
+                : BadRequest(result.Error);
         }
 
         /// <summary>
@@ -71,10 +70,9 @@ namespace Attender.Server.API.Controllers
         public async Task<ActionResult<AuthInfo>> Register([FromBody] UserRegistrationInfoDto dto)
         {
             var result = await _authService.RegisterUser(dto);
-
-            if (result.Succeeded) return Ok(result.Data);
-
-            return BadRequest(result.Error);
+            return result.Succeeded
+                ? Ok(result.Data)
+                : BadRequest(result.Error);
         }
 
         /// <summary>
@@ -88,10 +86,9 @@ namespace Attender.Server.API.Controllers
         public async Task<ActionResult<AuthTokens>> RefreshToken([FromBody] RefreshTokenDto dto)
         {
             var result = await _authService.RefreshToken(dto);
-
-            if (result.Succeeded) return Ok(result.Data);
-
-            return BadRequest(result.Error);
+            return result.Succeeded
+                ? Ok(result.Data)
+                : BadRequest(result.Error);
         }
     }
 }
