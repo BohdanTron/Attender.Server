@@ -22,13 +22,14 @@ namespace Attender.Server.API.Controllers
             _currentUserService = currentUserService;
 
         /// <summary>
-        /// Gets list of subcategories
+        /// Searches subcategories by name, retrieves all subcategories if name is null
         /// </summary>
+        /// <response code="200">List of subcategories has been retrieved</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<SubCategoryDto>>> Get([FromQuery] GetSubCategoriesQuery request)
         {
-            return Ok(await Mediator.Send(request));
+            return await Mediator.Send(request);
         }
 
         /// <summary>
@@ -39,7 +40,7 @@ namespace Attender.Server.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<int>> SaveSubCategories([FromBody] CreateUserSubCategoriesDto request)
+        public async Task<ActionResult<int>> Save([FromBody] CreateUserSubCategoriesDto request)
         {
             var userId = _currentUserService.UserId;
 

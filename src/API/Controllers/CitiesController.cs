@@ -22,8 +22,9 @@ namespace Attender.Server.API.Controllers
             _currentUserService = currentUserService;
 
         /// <summary>
-        /// Gets list of cities
+        /// Searches cities by name, retrieves all cities if name is null
         /// </summary>
+        /// <response code="200">List of cities has been retrieved</response>
         [HttpGet]
         public async Task<ActionResult<List<CityDto>>> Get([FromQuery] GetCitiesQuery request)
         {
@@ -38,7 +39,7 @@ namespace Attender.Server.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<int>> SaveCities([FromBody] CreateUserCitiesDto request)
+        public async Task<ActionResult<int>> Save([FromBody] CreateUserCitiesDto request)
         {
             var userId = _currentUserService.UserId;
 

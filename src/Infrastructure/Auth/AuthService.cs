@@ -33,7 +33,8 @@ namespace Attender.Server.Infrastructure.Auth
                 .AnyAsync(u => u.PhoneNumber == dto.PhoneNumber || u.UserName == dto.UserName ||
                                dto.Email != null && u.Email == dto.Email);
 
-            if (exists) return Result.Failure<AuthInfo>(Errors.User.Exists());
+            if (exists) 
+                return Result.Failure<AuthInfo>(Errors.User.Exists());
 
             var language = await _dbContext.Languages.FirstOrDefaultAsync(l => l.Code == dto.LanguageCode);
             if (language is null)

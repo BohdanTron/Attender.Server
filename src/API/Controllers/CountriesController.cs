@@ -23,7 +23,7 @@ namespace Attender.Server.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<CountryDto>>> Get([FromQuery] GetCountriesQuery request)
         {
-            return Ok(await Mediator.Send(request));
+            return await Mediator.Send(request);
         }
 
         /// <summary>
@@ -32,9 +32,9 @@ namespace Attender.Server.API.Controllers
         /// <response code="200">List of the closest countries has been retrieved</response>
         [HttpGet("closest")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<CountryDto>>> GetClosestCountries([FromQuery] GetClosestCountriesQuery request)
+        public async Task<ActionResult<List<CountryDto>>> GetClosest([FromQuery] GetClosestCountriesQuery request)
         {
-            return Ok(await Mediator.Send(request));
+            return await Mediator.Send(request);
         }
     }
 }
