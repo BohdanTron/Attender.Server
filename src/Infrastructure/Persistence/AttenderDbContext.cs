@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 namespace Attender.Server.Infrastructure.Persistence
 {
-    public class AttenderDbContext : DbContext, IAttenderDbContext
+    public partial class AttenderDbContext : DbContext, IAttenderDbContext
     {
         public AttenderDbContext()
         {

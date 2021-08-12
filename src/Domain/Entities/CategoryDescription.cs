@@ -3,7 +3,7 @@
     public class CategoryDescription
     {
         public int Id { get; set; }
-        public string Text { get; set; } = default!;
+        public string Text { get; set; } = string.Empty;
         public int LanguageId { get; set; }
         public int CategoryId { get; set; }
 
