@@ -1,10 +1,11 @@
 ﻿using Attender.Server.API.Constants;
+using Attender.Server.API.Requests;
 using Attender.Server.Application.Common.Interfaces;
+using Attender.Server.Application.Common.Models;
 using Attender.Server.Application.Events.Queries.GetUserEvents;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
 
@@ -25,10 +26,16 @@ namespace Attender.Server.API.Controllers
         /// <response code="200">List of events has been retrieved</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<EventDto>>> Get()
+        public async Task<ActionResult<PaginatedList<EventDto>>> Get([FromQuery] PaginationRequest request)
         {
-            var userId = _currentUserService.UserId;
-            return await Mediator.Send(new GetUserEventsQuery(userId));
+            var query = new GetUserEventsQuery
+            {
+                UserId = _currentUserService.UserId,
+                PageSize = request.PageSize,
+                PageNumber = request.PageNumber
+            };
+
+            return await Mediator.Send(query);
         }
     }
 }

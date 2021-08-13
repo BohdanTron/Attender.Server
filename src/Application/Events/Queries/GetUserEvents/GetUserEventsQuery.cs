@@ -1,23 +1,29 @@
 ﻿using Attender.Server.Application.Common.Interfaces;
+using Attender.Server.Application.Common.Mappings;
+using Attender.Server.Application.Common.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Events.Queries.GetUserEvents
 {
-    public record GetUserEventsQuery(int UserId) : IRequest<List<EventDto>>;
+    public record GetUserEventsQuery : IRequest<PaginatedList<EventDto>>
+    {
+        public int UserId { get; init; }
+        public int PageSize { get; init; } = 1;
+        public int PageNumber { get; init; } = 10;
+    }
 
-    internal class GetUserEventsHandler : IRequestHandler<GetUserEventsQuery, List<EventDto>>
+    internal class GetUserEventsHandler : IRequestHandler<GetUserEventsQuery, PaginatedList<EventDto>>
     {
         private readonly IAttenderDbContext _dbContext;
 
         public GetUserEventsHandler(IAttenderDbContext dbContext) =>
             _dbContext = dbContext;
 
-        public async Task<List<EventDto>> Handle(GetUserEventsQuery query, CancellationToken cancellationToken)
+        public async Task<PaginatedList<EventDto>> Handle(GetUserEventsQuery query, CancellationToken cancellationToken)
         {
             var userPreferences = await _dbContext.Users
                 .Where(u => u.Id == query.UserId)
@@ -48,7 +54,7 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
                         .FirstOrDefault()
                 })
                 .AsNoTracking()
-                .ToListAsync(cancellationToken);
+                .ToPaginatedListAsync(query.PageSize, query.PageNumber, cancellationToken);
 
             return events;
         }
