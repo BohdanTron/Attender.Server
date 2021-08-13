@@ -1,5 +1,6 @@
 ﻿using Attender.Server.Application.Common.Mappings;
 using Attender.Server.Domain.Entities;
+using AutoMapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +15,15 @@ namespace Attender.Server.Application.Events
         public string Name { get; init; } = default!;
         public string? Description { get; init; }
         public DateTime Date { get; init; }
-        public int LocationId { get; init; }
-        public int ArtistId { get; init; }
-        public int SubCategoryId { get; init; }
+        public decimal? LowestTicketPrice { get; set; }
+        public string LocationName { get; init; } = string.Empty;
+        public string ArtistName { get; init; } = string.Empty;
+    }
+
+    public record TicketDto
+    {
+        public int Id { get; init; }
+        public decimal? Price { get; set; }
+        public int EventId { get; init; }
     }
 }

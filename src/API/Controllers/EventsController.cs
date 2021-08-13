@@ -19,7 +19,7 @@ namespace Attender.Server.API.Controllers
         /// <response code="200">List of countries has been retrieved</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<EventDto>>> Get([FromQuery] GetEventsForUserQuery request)
+        public async Task<ActionResult<List<EventDto>>> Get([FromQuery] GetUserEventsQuery request)
         {
             return Ok(await Mediator.Send(request));
         }
