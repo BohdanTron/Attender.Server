@@ -1,5 +1,6 @@
-﻿using Attender.Server.Application.Events;
-using Attender.Server.Application.Events.Queries.GetEventsForUser;
+﻿using Attender.Server.API.Constants;
+using Attender.Server.Application.Common.Interfaces;
+using Attender.Server.Application.Events.Queries.GetUserEvents;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,19 +10,25 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.API.Controllers
 {
-    //[Authorize(Policy = AuthConstants.Policy.RegisteredOnly)]
+    [Authorize(Policy = AuthConstants.Policy.RegisteredOnly)]
     [Produces(MediaTypeNames.Application.Json)]
-    public class EventsController :ApiControllerBase
+    public class EventsController : ApiControllerBase
     {
+        private readonly ICurrentUserService _currentUserService;
+
+        public EventsController(ICurrentUserService currentUserService) =>
+            _currentUserService = currentUserService;
+
         /// <summary>
-        /// Gets list of events for specific  user by his preferred locations and subcategories
+        /// Gets list of events for specific user by their preferred locations and subcategories
         /// </summary>
-        /// <response code="200">List of countries has been retrieved</response>
+        /// <response code="200">List of events has been retrieved</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<EventDto>>> Get([FromQuery] GetUserEventsQuery request)
+        public async Task<ActionResult<List<EventDto>>> Get()
         {
-            return Ok(await Mediator.Send(request));
+            var userId = _currentUserService.UserId;
+            return await Mediator.Send(new GetUserEventsQuery(userId));
         }
     }
 }

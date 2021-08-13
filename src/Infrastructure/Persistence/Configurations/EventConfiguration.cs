@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using Attender.Server.Domain.Entities;
+﻿using Attender.Server.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Collections.Generic;
 
 namespace Attender.Server.Infrastructure.Persistence.Configurations
 {

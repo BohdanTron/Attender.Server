@@ -1,5 +1,4 @@
 ﻿using Attender.Server.Application.Countries.Services;
-using Attender.Server.Application.Events.Services;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +15,6 @@ namespace Attender.Server.Application
             services.AddMediatR(Assembly.GetExecutingAssembly());
 
             services.AddTransient<PopularCitiesService>();
-            services.AddTransient<EventsService>();
 
             return services;
         }
