@@ -16,7 +16,7 @@ namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
 
     internal class GetClosestCountriesHandler : IRequestHandler<GetClosestCountriesQuery, List<CountryDto>>
     {
-        public const int MaxCountriesCount = 3;
+        public const int MaxCountriesCount = 2;
 
         private readonly IAttenderDbContext _dbContext;
         private readonly PopularCitiesService _popularCitiesService;
@@ -47,7 +47,7 @@ namespace Attender.Server.Application.Countries.Queries.GetClosestCountries
         private async Task<List<CountryDto>> GetClosestCountriesTo(Country currentCountry, CancellationToken cancellationToken)
         {
             var allCountries = await _dbContext.Countries
-                .Where(c => c.Supported && c.Code != currentCountry.Code && c.Longitude != null && c.Latitude != null)
+                .Where(c => c.Supported && c.Longitude != null && c.Latitude != null)
                 .ToListAsync(cancellationToken);
 
             var closestCountries = new List<(Country Country, double Distance)>();

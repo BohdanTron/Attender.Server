@@ -7,8 +7,8 @@ namespace Attender.Server.Domain.Entities
     {
         public int Id { get; set; }
         public string? Email { get; set; }
-        public string UserName { get; set; } = default!;
-        public string PhoneNumber { get; set; } = default!;
+        public string UserName { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
         public Guid? AvatarId { get; set; }
         public byte RoleId { get; set; }
         public int LanguageId { get; set; }

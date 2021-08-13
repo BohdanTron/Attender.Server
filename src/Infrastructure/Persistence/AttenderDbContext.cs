@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 namespace Attender.Server.Infrastructure.Persistence
 {
-    public class AttenderDbContext : DbContext, IAttenderDbContext
+    public partial class AttenderDbContext : DbContext, IAttenderDbContext
     {
         public AttenderDbContext()
         {
@@ -19,12 +19,15 @@ namespace Attender.Server.Infrastructure.Persistence
             : base(options)
         {
             var connection = (SqlConnection) Database.GetDbConnection();
-            var credential = new DefaultAzureCredential();
+            if (connection.DataSource != null && connection.DataSource.Contains("database.windows.net"))
+            {
+                var credential = new DefaultAzureCredential();
 
-            var azureSqlScopes = new[] { "https://database.windows.net/.default" };
-            var accessToken = credential.GetToken(new TokenRequestContext(azureSqlScopes));
+                var azureSqlScopes = new[] { "https://database.windows.net/.default" };
+                var accessToken = credential.GetToken(new TokenRequestContext(azureSqlScopes));
 
-            connection.AccessToken = accessToken.Token;
+                connection.AccessToken = accessToken.Token;
+            }
         }
 
         public virtual DbSet<Artist> Artists => Set<Artist>();

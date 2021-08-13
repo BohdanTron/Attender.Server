@@ -33,10 +33,11 @@ namespace Attender.Server.Infrastructure.Auth
                 .AnyAsync(u => u.PhoneNumber == dto.PhoneNumber || u.UserName == dto.UserName ||
                                dto.Email != null && u.Email == dto.Email);
 
-            if (exists) return Result.Failure<AuthInfo>(Errors.User.Exists());
+            if (exists) 
+                return Result.Failure<AuthInfo>(Errors.User.Exists());
 
             var language = await _dbContext.Languages.FirstOrDefaultAsync(l => l.Code == dto.LanguageCode);
-            if (language is null) 
+            if (language is null)
                 return Result.Failure<AuthInfo>(Errors.Language.CodeNotExist());
 
             var user = new User
@@ -53,7 +54,7 @@ namespace Attender.Server.Infrastructure.Auth
             await _dbContext.SaveChangesAsync();
 
             var tokens = await _tokensGenerator.GenerateAuthTokens(user.Id, user.UserName);
-            var result = new AuthInfo(tokens, user.Id);
+            var result = new AuthInfo(tokens, ToUserDto(user));
 
             return Result.Success(result);
         }
@@ -66,9 +67,9 @@ namespace Attender.Server.Infrastructure.Auth
             if (user is not null)
             {
                 var tokens = await _tokensGenerator.GenerateAuthTokens(user.Id, user.UserName);
-                return new AuthInfo(tokens, user.Id);
+                return new AuthInfo(tokens, ToUserDto(user));
             }
-            
+
             var accessToken = new AuthTokens(_tokensGenerator.GenerateAccessToken());
             return new AuthInfo(accessToken);
         }
@@ -92,6 +93,17 @@ namespace Attender.Server.Infrastructure.Auth
 
             var tokens = await _tokensGenerator.GenerateAuthTokens(user.Id, user.UserName);
             return Result.Success(tokens);
+        }
+
+        private static UserDto ToUserDto(User user)
+        {
+            return new()
+            {
+                Id = user.Id,
+                Email = user.Email,
+                UserName = user.UserName,
+                PhoneNumber = user.PhoneNumber
+            };
         }
     }
 }

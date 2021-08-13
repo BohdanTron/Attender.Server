@@ -15,10 +15,8 @@ namespace Attender.Server.API.Controllers
     {
         private readonly IBlobService _blobService;
 
-        public UploadController(IBlobService blobService)
-        {
+        public UploadController(IBlobService blobService) => 
             _blobService = blobService;
-        }
 
         /// <summary>
         /// Uploads user's avatar to the storage
