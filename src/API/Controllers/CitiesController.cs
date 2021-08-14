@@ -1,8 +1,8 @@
 ﻿using Attender.Server.API.Constants;
+using Attender.Server.Application.Cities.Commands.CreateUserCities;
 using Attender.Server.Application.Cities.Queries.GetCities;
 using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
-using Attender.Server.Application.Users.Commands.CreateUserCities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +18,7 @@ namespace Attender.Server.API.Controllers
     {
         private readonly ICurrentUserService _currentUserService;
 
-        public CitiesController(ICurrentUserService currentUserService) => 
+        public CitiesController(ICurrentUserService currentUserService) =>
             _currentUserService = currentUserService;
 
         /// <summary>

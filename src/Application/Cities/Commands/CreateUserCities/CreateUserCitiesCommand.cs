@@ -8,18 +8,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Attender.Server.Application.Users.Commands.CreateUserCities
+namespace Attender.Server.Application.Cities.Commands.CreateUserCities
 {
-    public record CreateUserCitiesCommand(int UserId, IEnumerable<int> CityIds) : IRequest<Result<int>>;
+    public record CreateUserCitiesCommand(int UserId, ICollection<int> CityIds) : IRequest<Result<int>>;
 
     public class CreateUserCitiesCommandHandler : IRequestHandler<CreateUserCitiesCommand, Result<int>>
     {
         private readonly IAttenderDbContext _dbContext;
 
-        public CreateUserCitiesCommandHandler(IAttenderDbContext dbContext)
-        {
+        public CreateUserCitiesCommandHandler(IAttenderDbContext dbContext) =>
             _dbContext = dbContext;
-        }
 
         public async Task<Result<int>> Handle(CreateUserCitiesCommand request, CancellationToken cancellationToken)
         {

@@ -1,8 +1,8 @@
 ﻿using Attender.Server.API.Constants;
 using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
+using Attender.Server.Application.SubCategories.Commands.CreateUserSubCategories;
 using Attender.Server.Application.SubCategories.Queries.GetSubCategories;
-using Attender.Server.Application.Users.Commands.CreateUserSubCategories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -47,8 +47,8 @@ namespace Attender.Server.API.Controllers
             var command = new CreateUserSubCategoriesCommand(userId, request.SubCategoryIds);
             var result = await Mediator.Send(command);
 
-            return result.Succeeded 
-                ? Created(string.Empty, result.Data) 
+            return result.Succeeded
+                ? Created(string.Empty, result.Data)
                 : BadRequest(result.Error);
         }
     }
