@@ -33,7 +33,6 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
                     ArtistIds = u.Artists.Select(a => a.Id),
                     SubCategoryIds = u.SubCategories.Select(s => s.Id)
                 })
-                .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);
 
             var events = await _dbContext.Events
@@ -53,7 +52,6 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
                         .Select(t => t.Price)
                         .FirstOrDefault()
                 })
-                .AsNoTracking()
                 .ToPaginatedListAsync(query.PageSize, query.PageNumber, cancellationToken);
 
             return events;

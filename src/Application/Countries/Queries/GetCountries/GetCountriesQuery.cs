@@ -38,7 +38,6 @@ namespace Attender.Server.Application.Countries.Queries.GetCountries
                 .Where(c => c.Name.Contains(query.Name))
                 .ProjectTo<CountryDto>(_mapper.ConfigurationProvider)
                 .OrderBy(c => c.Id)
-                .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
             var countryIds = countries.Select(c => c.Id);

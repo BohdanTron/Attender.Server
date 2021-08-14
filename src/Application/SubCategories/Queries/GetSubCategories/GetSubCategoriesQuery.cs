@@ -28,7 +28,6 @@ namespace Attender.Server.Application.SubCategories.Queries.GetSubCategories
             return _dbContext.SubCategories
                 .Where(s => query.Name == null || s.Name.Contains(query.Name))
                 .ProjectTo<SubCategoryDto>(_mapper.ConfigurationProvider)
-                .AsNoTracking()
                 .ToListAsync(cancellationToken);
         }
     }

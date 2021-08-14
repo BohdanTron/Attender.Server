@@ -1,5 +1,4 @@
 ﻿using Attender.Server.Application.Common.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -32,7 +31,6 @@ namespace Attender.Server.Application.Countries.Services
                     CountryId = group.Key.CountryId
                 })
                 .Take(MaxCitiesCount)
-                .AsNoTracking()
                 .ToLookup(c => c.CountryId);
 
             return cities;

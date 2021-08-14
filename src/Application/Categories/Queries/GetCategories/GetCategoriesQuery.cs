@@ -34,7 +34,6 @@ namespace Attender.Server.Application.Categories.Queries.GetCategories
                 return Result.Failure<List<CategoryDto>>(Errors.Language.CodeNotExist());
 
             var categories = await _dbContext.Categories
-                .AsNoTracking()
                 .Select(c => new CategoryDto
                 {
                     Id = c.Id,

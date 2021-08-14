@@ -31,7 +31,6 @@ namespace Attender.Server.Application.Cities.Queries.GetCities
             return _dbContext.Cities
                 .Where(CitiesPredicate(query))
                 .ProjectTo<CityDto>(_mapper.ConfigurationProvider)
-                .AsNoTracking()
                 .ToListAsync(cancellationToken);
         }
 
