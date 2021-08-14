@@ -1,8 +1,10 @@
 ﻿using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Mappings;
 using Attender.Server.Application.Common.Models;
+using Attender.Server.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +14,7 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
     public record GetUserEventsQuery : IRequest<PaginatedList<EventDto>>
     {
         public int UserId { get; init; }
+        public int SectionId { get; init; }
         public int PageSize { get; init; } = 1;
         public int PageNumber { get; init; } = 10;
     }
@@ -23,7 +26,18 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
         public GetUserEventsHandler(IAttenderDbContext dbContext) =>
             _dbContext = dbContext;
 
-        public async Task<PaginatedList<EventDto>> Handle(GetUserEventsQuery query, CancellationToken cancellationToken)
+        public Task<PaginatedList<EventDto>> Handle(GetUserEventsQuery query, CancellationToken cancellationToken)
+        {
+            return query.SectionId switch
+            {
+                (byte) EventSection.EventsForYou => GetEventsForYou(query, cancellationToken),
+                (byte) EventSection.OurRecommendation => throw new NotImplementedException(),
+                (byte) EventSection.Bestsellers => throw new NotImplementedException(),
+                _ => throw new NotImplementedException()
+            };
+        }
+
+        private async Task<PaginatedList<EventDto>> GetEventsForYou(GetUserEventsQuery query, CancellationToken cancellationToken)
         {
             var userPreferences = await _dbContext.Users
                 .Where(u => u.Id == query.UserId)

@@ -20,6 +20,7 @@ namespace Attender.Server.Application.Common.Interfaces
         DbSet<RefreshToken> RefreshTokens { get; }
         DbSet<Language> Languages { get; }
         DbSet<CategoryDescription> CategoryDescriptions { get; }
+        DbSet<EventSection> EventSections { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = new());
     }

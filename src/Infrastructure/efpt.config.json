@@ -4,7 +4,7 @@
    "ContextNamespace": null,
    "DefaultDacpacSchema": null,
    "FilterSchemas": false,
-   "IncludeConnectionString": true,
+   "IncludeConnectionString": false,
    "ModelNamespace": null,
    "OutputContextPath": "Persistence",
    "OutputPath": null,
@@ -14,11 +14,11 @@
    "SelectedToBeGenerated": 1,
    "Tables": [
       {
-         "Name": "[dbo].[Users]",
+         "Name": "[dbo].[EventSections]",
          "ObjectType": 0
       }
    ],
-   "UiHint": "(localdb)\\mssqllocaldb.Attender",
+   "UiHint": "C:\\sources\\Attender\\attendr\\Attender.Server\\db\\Attender\\bin\\Debug\\Attender.dacpac",
    "UseBoolPropertiesWithoutDefaultSql": false,
    "UseDatabaseNames": false,
    "UseDbContextSplitting": true,
@@ -31,5 +31,6 @@
    "UseNoObjectFilter": false,
    "UseNodaTime": false,
    "UseNullableReferences": true,
+   "UseSchemaFolders": false,
    "UseSpatial": false
 }
