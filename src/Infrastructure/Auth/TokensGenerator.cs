@@ -68,10 +68,7 @@ namespace Attender.Server.Infrastructure.Auth
 
         private async Task<Token> CreateRefreshToken(int userId, string accessTokenId)
         {
-            //var expires = _authOptions.RefreshTokenLifetimeYears;
-
-            // Added for test purpose, will be replaces with a real value in the future
-            var expires = DateTime.UtcNow.AddMinutes(5);
+            var expires = _authOptions.RefreshTokenLifetimeDays;
 
             var refreshToken = new RefreshToken
             {
@@ -79,7 +76,7 @@ namespace Attender.Server.Infrastructure.Auth
                 Used = false,
                 UserId = userId,
                 AddedDate = DateTime.UtcNow,
-                ExpiryDate = expires, //DateTime.UtcNow.AddYears(expires),
+                ExpiryDate = DateTime.UtcNow.AddDays(expires),
                 Value = GenerateRefreshTokenValue()
             };
 
