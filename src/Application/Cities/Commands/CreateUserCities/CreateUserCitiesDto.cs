@@ -2,8 +2,9 @@
 
 namespace Attender.Server.Application.Cities.Commands.CreateUserCities
 {
-    public class CreateUserCitiesDto
+    public record CreateUserCitiesDto
     {
-        public ICollection<int> CityIds { get; set; } = new List<int>();
+        public ICollection<CountryDto> Countries { get; set; } = new List<CountryDto>();
+        public bool BindAllCountries { get; set; }
     }
 }

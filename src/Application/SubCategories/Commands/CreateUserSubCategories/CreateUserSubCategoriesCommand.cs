@@ -29,14 +29,16 @@ namespace Attender.Server.Application.SubCategories.Commands.CreateUserSubCatego
                 .Include(u => u.SubCategories)
                 .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
-            if (user.SubCategories.Any(s => subCategoryIds.Contains(s.Id)))
-                return Result.Failure<int>(Errors.SubCategories.AlreadyAppliedForUser());
+            if (user is null)
+                return Result.Failure<int>(Errors.User.NotExist());
 
             var subCategories = await _dbContext.SubCategories
                 .Where(s => subCategoryIds.Contains(s.Id))
                 .ToListAsync(cancellationToken);
 
-            subCategories.ForEach(user.SubCategories.Add);
+            var subCategoriesToAdd = subCategories.Except(user.SubCategories).ToList();
+
+            subCategoriesToAdd.ForEach(user.SubCategories.Add);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return Result.Success(user.Id);

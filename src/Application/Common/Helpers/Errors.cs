@@ -7,7 +7,10 @@ namespace Attender.Server.Application.Common.Helpers
         public static class User
         {
             public static Error Exists() =>
-                new("user_already_exists", "User with such settings already exists");
+                new("user_already_exists", "User already exists");
+
+            public static Error NotExist() =>
+                new("user_not_exist", "User doesn't exist");
 
             public static Error UserNameRequired() =>
                 new("user_name_required", "User name wasn't provided");
@@ -83,18 +86,6 @@ namespace Attender.Server.Application.Common.Helpers
 
             public static Error Invalid() =>
                 new("phone_number_invalid", "Phone number has incorrect format");
-        }
-
-        public static class SubCategories
-        {
-            public static Error AlreadyAppliedForUser() =>
-                new("subcategories_already_applied_for_user", "Given subcategories already applied for the user");
-        }
-
-        public static class Cities
-        {
-            public static Error AlreadyAppliedForUser() =>
-                new("cities_already_applied_for_user", "Given cities already applied for the user");
         }
 
         public static class Language

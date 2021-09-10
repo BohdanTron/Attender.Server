@@ -2,8 +2,8 @@
 
 namespace Attender.Server.Application.SubCategories.Commands.CreateUserSubCategories
 {
-    public class CreateUserSubCategoriesDto
+    public record CreateUserSubCategoriesDto
     {
-        public ICollection<int> SubCategoryIds { get; set; } = new List<int>();
+        public ICollection<int> SubCategoryIds { get; init; } = new List<int>();
     }
 }

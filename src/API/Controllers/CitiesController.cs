@@ -43,10 +43,15 @@ namespace Attender.Server.API.Controllers
         {
             var userId = _currentUserService.UserId;
 
-            var command = new CreateUserCitiesCommand(userId, request.CityIds);
+            var command = new CreateUserCitiesCommand
+            {
+                UserId = userId,
+                Countries = request.Countries,
+                BindAllCountries = request.BindAllCountries
+            };
             var result = await Mediator.Send(command);
 
-            return result.Succeeded ? Ok(result.Data) : BadRequest(result.Error);
+            return result.Succeeded ? Created(string.Empty, result.Data) : BadRequest(result.Error);
         }
     }
 }
