@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Attender.Server.Domain.Entities
 {
@@ -9,7 +8,7 @@ namespace Attender.Server.Domain.Entities
         public string? Email { get; set; }
         public string UserName { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
-        public Guid? AvatarId { get; set; }
+        public string? AvatarUrl { get; set; }
         public byte RoleId { get; set; }
         public int LanguageId { get; set; }
 

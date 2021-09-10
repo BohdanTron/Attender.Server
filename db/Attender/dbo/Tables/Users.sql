@@ -3,7 +3,7 @@
     [Email]         VARCHAR (50)        NULL,
     [UserName]      VARCHAR (25)        NOT NULL,
     [PhoneNumber]   VARCHAR (25)        NOT NULL,
-    [AvatarId]      UNIQUEIDENTIFIER    NULL,
+    [AvatarUrl]     VARCHAR(250)        NULL,
     [RoleId]        TINYINT             NOT NULL,
     [LanguageId]    INT                 NOT NULL,
 

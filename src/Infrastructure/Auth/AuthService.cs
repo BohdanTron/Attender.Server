@@ -46,7 +46,7 @@ namespace Attender.Server.Infrastructure.Auth
                 UserName = dto.UserName,
                 Email = dto.Email,
                 RoleId = (byte) Role.User,
-                AvatarId = dto.AvatarId,
+                AvatarUrl = dto.AvatarUrl,
                 Language = language
             };
 
@@ -102,7 +102,8 @@ namespace Attender.Server.Infrastructure.Auth
                 Id = user.Id,
                 Email = user.Email,
                 UserName = user.UserName,
-                PhoneNumber = user.PhoneNumber
+                PhoneNumber = user.PhoneNumber,
+                AvatarUrl = user.AvatarUrl
             };
         }
     }
