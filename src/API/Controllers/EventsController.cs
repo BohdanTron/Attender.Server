@@ -42,14 +42,15 @@ namespace Attender.Server.API.Controllers
         }
 
         /// <summary>
-        /// Gets list of event sections
+        /// Gets list of event sections according to user's preferable language
         /// </summary>
         /// <response code="200">List of event sections has been retrieved</response>
         [HttpGet("sections")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<EventSectionDto>>> GetSections()
         {
-            return await Mediator.Send(new GetEventSectionsQuery());
+            var userId = _currentUserService.UserId;
+            return await Mediator.Send(new GetEventSectionsQuery(userId));
         }
     }
 }

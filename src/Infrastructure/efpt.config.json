@@ -16,6 +16,10 @@
       {
          "Name": "[dbo].[EventSections]",
          "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Languages]",
+         "ObjectType": 0
       }
    ],
    "UiHint": "C:\\sources\\Attender\\attendr\\Attender.Server\\db\\Attender\\bin\\Debug\\Attender.dacpac",
@@ -27,6 +31,7 @@
    "UseInflector": true,
    "UseLegacyPluralizer": false,
    "UseNoConstructor": false,
+   "UseNoDefaultConstructor": false,
    "UseNoNavigations": false,
    "UseNoObjectFilter": false,
    "UseNodaTime": false,
