@@ -6,6 +6,7 @@ using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Models;
 using Attender.Server.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading.Tasks;
 using Role = Attender.Server.Domain.Enums.Role;
 
@@ -33,7 +34,7 @@ namespace Attender.Server.Infrastructure.Auth
                 .AnyAsync(u => u.PhoneNumber == dto.PhoneNumber || u.UserName == dto.UserName ||
                                dto.Email != null && u.Email == dto.Email);
 
-            if (exists) 
+            if (exists)
                 return Result.Failure<AuthInfo>(Errors.User.Exists());
 
             var language = await _dbContext.Languages.FirstOrDefaultAsync(l => l.Code == dto.LanguageCode);
@@ -53,8 +54,17 @@ namespace Attender.Server.Infrastructure.Auth
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
 
+            var userDto = new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                UserName = user.UserName,
+                PhoneNumber = user.PhoneNumber,
+                AvatarUrl = user.AvatarUrl
+            };
+
             var tokens = await _tokensGenerator.GenerateAuthTokens(user.Id, user.UserName);
-            var result = new AuthInfo(tokens, ToUserDto(user));
+            var result = new AuthInfo(tokens, userDto);
 
             return Result.Success(result);
         }
@@ -62,12 +72,23 @@ namespace Attender.Server.Infrastructure.Auth
         public async Task<AuthInfo> LoginOrGenerateAccessToken(string phoneNumber)
         {
             var user = await _dbContext.Users
-                .SingleOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
+                .Where(u => u.PhoneNumber == phoneNumber)
+                .Select(u => new UserDto
+                {
+                    Id = u.Id,
+                    Email = u.Email,
+                    UserName = u.UserName,
+                    PhoneNumber = u.PhoneNumber,
+                    AvatarUrl = u.AvatarUrl,
+                    HasCities = u.Cities.Any(),
+                    HasSubCategories = u.SubCategories.Any()
+                })
+                .SingleOrDefaultAsync();
 
             if (user is not null)
             {
                 var tokens = await _tokensGenerator.GenerateAuthTokens(user.Id, user.UserName);
-                return new AuthInfo(tokens, ToUserDto(user));
+                return new AuthInfo(tokens, user);
             }
 
             var accessToken = new AuthTokens(_tokensGenerator.GenerateAccessToken());
@@ -93,18 +114,6 @@ namespace Attender.Server.Infrastructure.Auth
 
             var tokens = await _tokensGenerator.GenerateAuthTokens(user.Id, user.UserName);
             return Result.Success(tokens);
-        }
-
-        private static UserDto ToUserDto(User user)
-        {
-            return new()
-            {
-                Id = user.Id,
-                Email = user.Email,
-                UserName = user.UserName,
-                PhoneNumber = user.PhoneNumber,
-                AvatarUrl = user.AvatarUrl
-            };
         }
     }
 }
