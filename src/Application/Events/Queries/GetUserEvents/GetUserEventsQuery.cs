@@ -5,6 +5,7 @@ using Attender.Server.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,10 +31,11 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
         {
             return query.SectionId switch
             {
-                (byte) EventSection.EventsForYou => GetEventsForYou(query, cancellationToken),
-                (byte) EventSection.OurRecommendation => throw new NotImplementedException(),
-                (byte) EventSection.Bestsellers => throw new NotImplementedException(),
-                _ => throw new NotImplementedException()
+                (byte)EventSection.EventsForYou => GetEventsForYou(query, cancellationToken),
+                (byte)EventSection.OurRecommendation => GetRecomendedEvents(query, cancellationToken),
+                (byte)EventSection.Bestsellers => throw new NotImplementedException(),
+                (byte)EventSection.LastChance => GetLastChanceEvents(query, cancellationToken)
+                //=> throw new NotImplementedException(),
             };
         }
 
@@ -65,6 +67,79 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
                         .OrderBy(t => t.Price)
                         .Select(t => t.Price)
                         .FirstOrDefault()
+                })
+                .ToPaginatedListAsync(query.PageSize, query.PageNumber, cancellationToken);
+
+            return events;
+        }
+
+        private async Task<PaginatedList<EventDto>> GetRecomendedEvents(GetUserEventsQuery query, CancellationToken cancellationToken)
+        {
+            var events = await _dbContext.Events
+                .Where(e => e.Promoted)
+                .Select(ev => new EventDto
+                {
+                    Id = ev.Id,
+                    Name = ev.Name,
+                    Description = ev.Description,
+                    Artist = ev.Artist!.Name,
+                    Location = ev.Location!.Name,
+                    LowestPrice = ev.Tickets
+                        .OrderBy(t => t.Price)
+                        .Select(t => t.Price)
+                        .FirstOrDefault()
+
+                })
+             .ToPaginatedListAsync(query.PageSize, query.PageNumber, cancellationToken);
+
+            return events;
+        }
+
+        private async Task<PaginatedList<EventDto>> GetLastChanceEvents(GetUserEventsQuery query, CancellationToken cancellationToken)
+        {
+            //var unsolvedTickets = _dbContext.Tickets
+            //    .Where(t => !t.OrderedDate.HasValue)
+            //    .GroupBy(t => t.EventId);
+            //.Select(t=> new TicketDto
+            //{
+            //    Id = t.Id,
+            //    EventId = t.EventId
+            //});
+
+
+            var unsolvedTickets2 = _dbContext.Tickets
+                                    .Where(t => !t.OrderedDate.HasValue)
+                                    .GroupBy(t => t.EventId)
+                                    .Select(a => new
+                                    {
+                                        EventId = a.Key,
+                                        TicetsCount = a.Count(),
+
+                                    });
+
+            var allTickets = _dbContext.Tickets
+                                     .GroupBy(t => t.EventId)
+                                    .Select(a => new
+                                    {
+                                        EventId = a.Key,
+                                        TicetsCount = a.Count()
+                                    });
+
+
+            var events = await _dbContext.Events
+                // .Where(t => unsolvedTickets2.Contains(t.Id))
+                .Select(e => new EventDto
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    Description = e.Description,
+                    Artist = e.Artist!.Name,
+                    Location = e.Location!.Name,
+                    LowestPrice = e.Tickets
+                        .OrderBy(t => t.Price)
+                        .Select(t => t.Price)
+                        .FirstOrDefault()
+
                 })
                 .ToPaginatedListAsync(query.PageSize, query.PageNumber, cancellationToken);
 

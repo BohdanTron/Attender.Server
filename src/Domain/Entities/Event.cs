@@ -12,7 +12,7 @@ namespace Attender.Server.Domain.Entities
         public int LocationId { get; set; }
         public int ArtistId { get; set; }
         public int SubCategoryId { get; set; }
-
+        public bool Promoted { get; set; }
         public virtual Artist? Artist { get; set; }
         public virtual Location? Location { get; set; }
         public virtual SubCategory? SubCategory { get; set; }
