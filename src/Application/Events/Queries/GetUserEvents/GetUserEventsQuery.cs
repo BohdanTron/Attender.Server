@@ -1,14 +1,14 @@
-﻿using Attender.Server.Application.Common.Interfaces;
-using Attender.Server.Application.Common.Mappings;
-using Attender.Server.Application.Common.Models;
-using Attender.Server.Domain.Enums;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Attender.Server.Application.Common.Interfaces;
+using Attender.Server.Application.Common.Mappings;
+using Attender.Server.Application.Common.Models;
+using Attender.Server.Domain.Entities;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using EventSection = Attender.Server.Domain.Enums.EventSection;
 
 namespace Attender.Server.Application.Events.Queries.GetUserEvents
 {
@@ -31,10 +31,10 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
         {
             return query.SectionId switch
             {
-                (byte)EventSection.EventsForYou => GetEventsForYou(query, cancellationToken),
-                (byte)EventSection.OurRecommendation => GetRecomendedEvents(query, cancellationToken),
-                (byte)EventSection.Bestsellers => throw new NotImplementedException(),
-                (byte)EventSection.LastChance => GetLastChanceEvents(query, cancellationToken)
+                (byte) EventSection.EventsForYou => GetEventsForYou(query, cancellationToken),
+                (byte) EventSection.OurRecommendation => GetRecomendedEvents(query, cancellationToken),
+                (byte) EventSection.Bestsellers => throw new NotImplementedException(),
+                (byte) EventSection.LastChance => GetLastChanceEvents(query, cancellationToken)
                 //=> throw new NotImplementedException(),
             };
         }
@@ -95,39 +95,24 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
             return events;
         }
 
-        private async Task<PaginatedList<EventDto>> GetLastChanceEvents(GetUserEventsQuery query, CancellationToken cancellationToken)
+        private async Task<PaginatedList<EventDto>> GetLastChanceEvents(GetUserEventsQuery query,
+            CancellationToken cancellationToken)
         {
-            //var unsolvedTickets = _dbContext.Tickets
-            //    .Where(t => !t.OrderedDate.HasValue)
-            //    .GroupBy(t => t.EventId);
-            //.Select(t=> new TicketDto
-            //{
-            //    Id = t.Id,
-            //    EventId = t.EventId
-            //});
+            var events1 = await _dbContext.Events
+                .Select(e => new
+                {
+                    EventId = e.Id,
+                    SoldTicketsCount = e.Tickets.Count(t => t.OrderedDate != null),
+                    UnsoldTicketsCount = e.Tickets.Count(t => t.OrderedDate == null)
+                }).ToListAsync(cancellationToken);
 
+            var eventIds = events1
+                .Where(e => e.UnsoldTicketsCount != 0 && e.SoldTicketsCount / e.UnsoldTicketsCount < 0.2)
+                .Select(e => e.EventId)
+                .ToList();
 
-            var unsolvedTickets2 = _dbContext.Tickets
-                                    .Where(t => !t.OrderedDate.HasValue)
-                                    .GroupBy(t => t.EventId)
-                                    .Select(a => new
-                                    {
-                                        EventId = a.Key,
-                                        TicetsCount = a.Count(),
-
-                                    });
-
-            var allTickets = _dbContext.Tickets
-                                     .GroupBy(t => t.EventId)
-                                    .Select(a => new
-                                    {
-                                        EventId = a.Key,
-                                        TicetsCount = a.Count()
-                                    });
-
-
-            var events = await _dbContext.Events
-                // .Where(t => unsolvedTickets2.Contains(t.Id))
+            var events2 = await _dbContext.Events
+                .Where(t => eventIds.Contains(t.Id))
                 .Select(e => new EventDto
                 {
                     Id = e.Id,
@@ -143,7 +128,7 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
                 })
                 .ToPaginatedListAsync(query.PageSize, query.PageNumber, cancellationToken);
 
-            return events;
+            return events2;
         }
     }
 }
