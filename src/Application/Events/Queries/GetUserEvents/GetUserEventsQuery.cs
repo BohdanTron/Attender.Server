@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Attender.Server.Application.Common.Interfaces;
 using Attender.Server.Application.Common.Mappings;
 using Attender.Server.Application.Common.Models;
-using Attender.Server.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using EventSection = Attender.Server.Domain.Enums.EventSection;
@@ -24,18 +23,17 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
     {
         private readonly IAttenderDbContext _dbContext;
 
-        public GetUserEventsHandler(IAttenderDbContext dbContext) =>
-            _dbContext = dbContext;
+        public GetUserEventsHandler(IAttenderDbContext dbContext) => _dbContext = dbContext;
 
         public Task<PaginatedList<EventDto>> Handle(GetUserEventsQuery query, CancellationToken cancellationToken)
         {
             return query.SectionId switch
             {
-                (byte) EventSection.EventsForYou => GetEventsForYou(query, cancellationToken),
-                (byte) EventSection.OurRecommendation => GetRecomendedEvents(query, cancellationToken),
-                (byte) EventSection.Bestsellers => throw new NotImplementedException(),
-                (byte) EventSection.LastChance => GetLastChanceEvents(query, cancellationToken)
-                //=> throw new NotImplementedException(),
+                (byte)EventSection.EventsForYou => GetEventsForYou(query, cancellationToken),
+                (byte)EventSection.OurRecommendation => GetRecomendedEvents(query, cancellationToken),
+                (byte)EventSection.Bestsellers => GetBestsellersEvents(query, cancellationToken),
+                (byte)EventSection.LastChance => GetLastChanceEvents(query, cancellationToken),
+                _ => throw new NotImplementedException()
             };
         }
 
@@ -98,7 +96,7 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
         private async Task<PaginatedList<EventDto>> GetLastChanceEvents(GetUserEventsQuery query,
             CancellationToken cancellationToken)
         {
-            var events1 = await _dbContext.Events
+            var events = await _dbContext.Events
                 .Select(e => new
                 {
                     EventId = e.Id,
@@ -106,12 +104,12 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
                     UnsoldTicketsCount = e.Tickets.Count(t => t.OrderedDate == null)
                 }).ToListAsync(cancellationToken);
 
-            var eventIds = events1
+            var eventIds = events
                 .Where(e => e.UnsoldTicketsCount != 0 && e.SoldTicketsCount / e.UnsoldTicketsCount < 0.2)
                 .Select(e => e.EventId)
                 .ToList();
 
-            var events2 = await _dbContext.Events
+            var lastChanceEvents = await _dbContext.Events
                 .Where(t => eventIds.Contains(t.Id))
                 .Select(e => new EventDto
                 {
@@ -128,7 +126,45 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
                 })
                 .ToPaginatedListAsync(query.PageSize, query.PageNumber, cancellationToken);
 
-            return events2;
+            return lastChanceEvents;
+        }
+
+        private async Task<PaginatedList<EventDto>> GetBestsellersEvents(GetUserEventsQuery query, CancellationToken cancellationToken)
+        {
+            var events = await _dbContext.Events
+                .Select(e => new
+                {
+                    EventId = e.Id,
+                    SoldTicketsCount = e.Tickets.Count(t => t.OrderedDate != null),
+                    StartSalesDate = e.Tickets.OrderByDescending(t => t.OrderedDate)
+                    .Select(t => t.OrderedDate).SingleOrDefault()
+                                               
+                }).ToListAsync(cancellationToken);
+
+            var eventIds = events
+                .Where(e => e.SoldTicketsCount != 0)
+                .OrderByDescending(e => e.SoldTicketsCount / (DateTime.Now.Second - e.StartSalesDate.Value.Second))
+                .Select(e => e.EventId)
+                .ToList();
+
+            var bestsellersEvents = await _dbContext.Events
+                .Where(t => eventIds.Contains(t.Id))
+                .Select(e => new EventDto
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    Description = e.Description,
+                    Artist = e.Artist!.Name,
+                    Location = e.Location!.Name,
+                    LowestPrice = e.Tickets
+                        .OrderBy(t => t.Price)
+                        .Select(t => t.Price)
+                        .FirstOrDefault()
+
+                })
+                .ToPaginatedListAsync(query.PageSize, query.PageNumber, cancellationToken);
+
+            return bestsellersEvents;
         }
     }
 }

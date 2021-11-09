@@ -18,20 +18,16 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
         public string Artist { get; init; } = string.Empty;
         public IEnumerable<TicketDto> Cities { get; set; } = new List<TicketDto>();
 
-        //public void Mapping(Profile profile)
-        //{
-        //    profile.CreateMap<Event, EventDto>()
-        //        .ForMember(d => d., opt => opt.Ignore());
-        //}
     }
+
 
     public record TicketDto
     {
-        public int Id { get; set; }
-        public decimal Price { get; set; }
-        public DateTime? OrderedDate { get; set; }
-        public int TicketsCount { get; set; }
-        public int? UserId { get; set; }
-        public int EventId { get; set; }
+        public int Id { get; init; }
+        public decimal Price { get; init; }
+        public DateTime? OrderedDate { get; init; }
+        public int TicketsCount { get; init; }
+        public int? UserId { get; init; }
+        public int EventId { get; init; }
     }
 }
