@@ -40,7 +40,7 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
         private async Task<PaginatedList<EventDto>> GetEventsForYou(GetUserEventsQuery query, CancellationToken cancellationToken)
         {
             var userPreferences = await _dbContext.Users
-                .Where(u => u.Id == query.UserId)
+                .Where(u => u.Id == 7)
                 .Select(u => new
                 {
                     LocationIds = u.Locations.Select(l => l.Id),
@@ -97,15 +97,16 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
             CancellationToken cancellationToken)
         {
             var events = await _dbContext.Events
+                .Where(e => e.Tickets.Count != 0)
                 .Select(e => new
                 {
                     EventId = e.Id,
-                    SoldTicketsCount = e.Tickets.Count(t => t.OrderedDate != null),
+                    AllTicketsCount = e.Tickets.Count(),
                     UnsoldTicketsCount = e.Tickets.Count(t => t.OrderedDate == null)
                 }).ToListAsync(cancellationToken);
 
             var eventIds = events
-                .Where(e => e.UnsoldTicketsCount != 0 && e.SoldTicketsCount / e.UnsoldTicketsCount < 0.2)
+                .Where(e => decimal.Divide(e.UnsoldTicketsCount, e.AllTicketsCount) < (decimal)0.2)
                 .Select(e => e.EventId)
                 .ToList();
 
@@ -132,12 +133,16 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
         private async Task<PaginatedList<EventDto>> GetBestsellersEvents(GetUserEventsQuery query, CancellationToken cancellationToken)
         {
             var events = await _dbContext.Events
+                .Where(e => e.Tickets.Count != 0)
                 .Select(e => new
                 {
                     EventId = e.Id,
                     SoldTicketsCount = e.Tickets.Count(t => t.OrderedDate != null),
-                    StartSalesDate = e.Tickets.OrderByDescending(t => t.OrderedDate)
-                    .Select(t => t.OrderedDate).SingleOrDefault()
+                    StartSalesDate = e.Tickets
+                                    .OrderBy(t => t.OrderedDate)
+                                    .Where(t=> t.OrderedDate != null)
+                    .Select(t => t.OrderedDate)
+                    .SingleOrDefault()
                                                
                 }).ToListAsync(cancellationToken);
 
