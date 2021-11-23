@@ -74,8 +74,8 @@ namespace Attender.Server.Application.Cities.Commands.CreateUserCities
             static Expression<Func<City, bool>> CitiesPredicate(CountryDto country)
             {
                 return country.BindAllCities
-                    ? c => c.Country!.Supported && c.Country!.Id == country.Id
-                    : c => c.Country!.Supported && country.CityIds.Contains(c.Id);
+                    ? c => c.Country!.Supported && c.CountryId == country.Id
+                    : c => c.Country!.Supported && c.CountryId == country.Id && country.CityIds.Contains(c.Id);
             }
         }
     }

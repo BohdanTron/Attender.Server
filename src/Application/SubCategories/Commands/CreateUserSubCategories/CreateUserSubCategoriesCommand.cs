@@ -71,7 +71,7 @@ namespace Attender.Server.Application.SubCategories.Commands.CreateUserSubCatego
             {
                 return category.BindAllSubCategories
                     ? c => c.CategoryId == category.Id
-                    : c => category.SubCategoryIds.Contains(c.Id);
+                    : c => c.CategoryId == category.Id && category.SubCategoryIds.Contains(c.Id);
             }
         }
     }
