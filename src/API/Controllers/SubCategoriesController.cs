@@ -45,7 +45,7 @@ namespace Attender.Server.API.Controllers
             var command = new CreateUserSubCategoriesCommand
             {
                 UserId = _currentUserService.UserId,
-                SubCategoryIds = request.SubCategoryIds,
+                Categories = request.Categories,
                 BindAllCategories = request.BindAllCategories
             };
             var result = await Mediator.Send(command);
