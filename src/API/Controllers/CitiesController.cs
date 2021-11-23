@@ -22,7 +22,7 @@ namespace Attender.Server.API.Controllers
             _currentUserService = currentUserService;
 
         /// <summary>
-        /// Searches cities by name, retrieves all cities if name is null
+        /// Searches cities by name in country, retrieves all cities from country if name is null
         /// </summary>
         /// <response code="200">List of cities has been retrieved</response>
         [HttpGet]

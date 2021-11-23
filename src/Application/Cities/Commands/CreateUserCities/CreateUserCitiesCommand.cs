@@ -16,8 +16,8 @@ namespace Attender.Server.Application.Cities.Commands.CreateUserCities
     public record CreateUserCitiesCommand : IRequest<Result<int>>
     {
         public int UserId { get; init; }
-        public ICollection<CountryDto> Countries { get; set; } = new List<CountryDto>();
-        public bool BindAllCountries { get; set; }
+        public ICollection<CountryDto> Countries { get; init; } = new List<CountryDto>();
+        public bool BindAllCountries { get; init; }
     }
 
     public class CreateUserCitiesCommandHandler : IRequestHandler<CreateUserCitiesCommand, Result<int>>

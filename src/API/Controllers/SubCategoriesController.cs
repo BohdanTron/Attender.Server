@@ -22,7 +22,7 @@ namespace Attender.Server.API.Controllers
             _currentUserService = currentUserService;
 
         /// <summary>
-        /// Searches subcategories by name, retrieves all subcategories if name is null
+        /// Searches subcategories by name in scope of category, retrieves all subcategories from category if name is null
         /// </summary>
         /// <response code="200">List of subcategories has been retrieved</response>
         [HttpGet]
@@ -42,9 +42,12 @@ namespace Attender.Server.API.Controllers
         [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<int>> Save([FromBody] CreateUserSubCategoriesDto request)
         {
-            var userId = _currentUserService.UserId;
-
-            var command = new CreateUserSubCategoriesCommand(userId, request.SubCategoryIds);
+            var command = new CreateUserSubCategoriesCommand
+            {
+                UserId = _currentUserService.UserId,
+                SubCategoryIds = request.SubCategoryIds,
+                BindAllCategories = request.BindAllCategories
+            };
             var result = await Mediator.Send(command);
 
             return result.Succeeded

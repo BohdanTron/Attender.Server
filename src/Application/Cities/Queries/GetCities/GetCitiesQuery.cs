@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.Cities.Queries.GetCities
 {
-    public record GetCitiesQuery(string? Name) : IRequest<List<CityDto>>;
+    public record GetCitiesQuery(int CountryId, string? Name) : IRequest<List<CityDto>>;
 
     internal class GetCitiesQueryHandler : IRequestHandler<GetCitiesQuery, List<CityDto>>
     {
@@ -37,8 +37,8 @@ namespace Attender.Server.Application.Cities.Queries.GetCities
         private static Expression<Func<City, bool>> CitiesPredicate(GetCitiesQuery query)
         {
             return c => query.Name == null
-                ? c.Country!.Supported
-                : c.Country!.Supported && c.Name.Contains(query.Name);
+                ? c.Country!.Supported && c.CountryId == query.CountryId
+                : c.Country!.Supported && c.CountryId == query.CountryId && c.Name.Contains(query.Name);
         }
     }
 }

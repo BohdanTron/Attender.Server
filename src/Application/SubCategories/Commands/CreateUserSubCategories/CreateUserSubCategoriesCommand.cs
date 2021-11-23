@@ -10,7 +10,12 @@ using System.Threading.Tasks;
 
 namespace Attender.Server.Application.SubCategories.Commands.CreateUserSubCategories
 {
-    public record CreateUserSubCategoriesCommand(int UserId, ICollection<int> SubCategoryIds) : IRequest<Result<int>>;
+    public record CreateUserSubCategoriesCommand : IRequest<Result<int>>
+    {
+        public int UserId { get; init; }
+        public ICollection<int> SubCategoryIds { get; init; } = new List<int>();
+        public bool BindAllCategories { get; init; }
+    }
 
     internal class CreateUserSubCategoriesCommandHandler : IRequestHandler<CreateUserSubCategoriesCommand, Result<int>>
     {
@@ -23,17 +28,15 @@ namespace Attender.Server.Application.SubCategories.Commands.CreateUserSubCatego
             CreateUserSubCategoriesCommand request,
             CancellationToken cancellationToken)
         {
-            var (userId, subCategoryIds) = request;
-
             var user = await _dbContext.Users
                 .Include(u => u.SubCategories)
-                .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+                .FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
 
             if (user is null)
                 return Result.Failure<int>(Errors.User.NotExist());
 
             var subCategories = await _dbContext.SubCategories
-                .Where(s => subCategoryIds.Contains(s.Id))
+                .Where(s => request.BindAllCategories || request.SubCategoryIds.Contains(s.Id))
                 .ToListAsync(cancellationToken);
 
             var subCategoriesToAdd = subCategories.Except(user.SubCategories).ToList();
