@@ -14,7 +14,7 @@ namespace Attender.Server.Application.Categories.Queries.GetCategories
 
     internal class GetCategoriesQueryHandler : IRequestHandler<GetCategoriesQuery, Result<List<CategoryDto>>>
     {
-        private const int MaxSubCategoriesCount = 6;
+        private const int MaxSubCategoriesCount = 5;
 
         private readonly IAttenderDbContext _dbContext;
 
