@@ -4,6 +4,7 @@
     {
         EventsForYou = 1,
         OurRecommendation = 2,
-        Bestsellers = 3
+        Bestsellers = 3,
+        LastChance = 4
     }
 }
