@@ -16,7 +16,7 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
         public bool Promoted { get; init; }
         public string Location { get; init; } = string.Empty;
         public string Artist { get; init; } = string.Empty;
-        public IEnumerable<TicketDto> Cities { get; set; } = new List<TicketDto>();
+        public IEnumerable<TicketDto> Cities { get; init; } = new List<TicketDto>();
 
     }
 

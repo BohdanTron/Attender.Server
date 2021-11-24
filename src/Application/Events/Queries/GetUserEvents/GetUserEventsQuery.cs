@@ -40,7 +40,7 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
         private async Task<PaginatedList<EventDto>> GetEventsForYou(GetUserEventsQuery query, CancellationToken cancellationToken)
         {
             var userPreferences = await _dbContext.Users
-                .Where(u => u.Id == 7)
+                .Where(u => u.Id == query.UserId)
                 .Select(u => new
                 {
                     LocationIds = u.Locations.Select(l => l.Id),
@@ -97,7 +97,7 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
             CancellationToken cancellationToken)
         {
             var events = await _dbContext.Events
-                .Where(e => e.Tickets.Count != 0)
+                .Where(e => e.Tickets.Any())
                 .Select(e => new
                 {
                     EventId = e.Id,
