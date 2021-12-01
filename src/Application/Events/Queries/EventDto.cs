@@ -14,6 +14,7 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
         public DateTime Date { get; init; }
         public decimal LowestPrice { get; init; }
         public bool Promoted { get; init; }
+        public string? ImageURL { get; init; }
         public string Location { get; init; } = string.Empty;
         public string Artist { get; init; } = string.Empty;
         public IEnumerable<TicketDto> Cities { get; init; } = new List<TicketDto>();

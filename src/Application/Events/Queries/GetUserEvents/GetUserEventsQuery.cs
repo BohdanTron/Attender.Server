@@ -64,7 +64,8 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
                     LowestPrice = e.Tickets
                         .OrderBy(t => t.Price)
                         .Select(t => t.Price)
-                        .FirstOrDefault()
+                        .FirstOrDefault(),
+                    ImageURL = e.ImageURL
                 })
                 .ToPaginatedListAsync(query.PageSize, query.PageNumber, cancellationToken);
 
@@ -73,7 +74,7 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
 
         private async Task<PaginatedList<EventDto>> GetRecomendedEvents(GetUserEventsQuery query, CancellationToken cancellationToken)
         {
-            var events = await _dbContext.Events
+            var recommendedEvents = await _dbContext.Events
                 .Where(e => e.Promoted)
                 .Select(ev => new EventDto
                 {
@@ -86,12 +87,12 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
                     LowestPrice = ev.Tickets
                         .OrderBy(t => t.Price)
                         .Select(t => t.Price)
-                        .FirstOrDefault()
-
+                        .FirstOrDefault(),
+                    ImageURL = ev.ImageURL
                 })
              .ToPaginatedListAsync(query.PageSize, query.PageNumber, cancellationToken);
 
-            return events;
+            return recommendedEvents;
         }
 
         private async Task<PaginatedList<EventDto>> GetLastChanceEvents(GetUserEventsQuery query,
@@ -124,8 +125,8 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
                     LowestPrice = e.Tickets
                         .OrderBy(t => t.Price)
                         .Select(t => t.Price)
-                        .FirstOrDefault()
-
+                        .FirstOrDefault(),
+                    ImageURL = e.ImageURL
                 })
                 .ToPaginatedListAsync(query.PageSize, query.PageNumber, cancellationToken);
 
@@ -167,8 +168,8 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
                     LowestPrice = e.Tickets
                         .OrderBy(t => t.Price)
                         .Select(t => t.Price)
-                        .FirstOrDefault()
-
+                        .FirstOrDefault(),
+                    ImageURL = e.ImageURL
                 })
                 .ToPaginatedListAsync(query.PageSize, query.PageNumber, cancellationToken);
 

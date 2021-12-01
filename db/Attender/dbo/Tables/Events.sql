@@ -7,6 +7,7 @@
     [ArtistId]      INT           NOT NULL,
     [SubCategoryId] INT           NOT NULL,
     [Promoted]      BIT           NOT NULL DEFAULT(0),
+    [ImageURL] VARCHAR(250) NULL, 
     CONSTRAINT [PK_Events] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_Events_Artists] FOREIGN KEY ([ArtistId]) REFERENCES [dbo].[Artists] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_Events_Locations] FOREIGN KEY ([LocationId]) REFERENCES [dbo].[Locations] ([Id]) ON DELETE CASCADE,
