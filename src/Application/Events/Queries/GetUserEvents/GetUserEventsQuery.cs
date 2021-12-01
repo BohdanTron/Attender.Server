@@ -81,6 +81,7 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
                     Name = ev.Name,
                     Description = ev.Description,
                     Artist = ev.Artist!.Name,
+                    Date = ev.Date,
                     Location = ev.Location!.Name,
                     LowestPrice = ev.Tickets
                         .OrderBy(t => t.Price)
@@ -119,6 +120,7 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
                     Description = e.Description,
                     Artist = e.Artist!.Name,
                     Location = e.Location!.Name,
+                    Date = e.Date,
                     LowestPrice = e.Tickets
                         .OrderBy(t => t.Price)
                         .Select(t => t.Price)
@@ -161,6 +163,7 @@ namespace Attender.Server.Application.Events.Queries.GetUserEvents
                     Description = e.Description,
                     Artist = e.Artist!.Name,
                     Location = e.Location!.Name,
+                    Date = e.Date,
                     LowestPrice = e.Tickets
                         .OrderBy(t => t.Price)
                         .Select(t => t.Price)
